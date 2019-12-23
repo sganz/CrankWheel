@@ -70,9 +70,35 @@ CrankWheel.spokeRatio = 1.0;
 CrankWheel.hubRatio = 1.5;
 CrankWheel.rimRatio = 0.8;
 CrankWheel.centerHoleDiameter = 1.0;
+CrankWheel.showLegend = true;
+CrankWheel.showDebug = false;
 
 CrankWheel.prototype.toString = function () {
     print("CrankWheel.js:", "toString(): ");
+}
+
+// Build a string for the legend. This uses the class vars
+CrankWheel.getLegendStr = function () {
+    var t = "";
+    t += "Wheel Diameter       : " + CrankWheel.wheelDiameter + "\n"
+    t += "Tooth Count          : " + CrankWheel.numberOfTeeth + "\n";
+    t += "Missing Teeth        : " + CrankWheel.missingTeeth + "\n";
+    t += "Tooth Height         : " + CrankWheel.toothHeight + "\n";
+    t += "Center Hole Diameter : " + CrankWheel.toothHeight + "\n";
+    t += "Number of Spokes     : " + CrankWheel.numberOfSpokes + "\n";
+    t += "Number of Spokes     : " + CrankWheel.numberOfSpokes + "\n";
+    t += "Spoke Ratio          : " + CrankWheel.spokeRatio + "\n";
+    t += "Bolt Hole Pattern 1" + "\n";
+    t += "  Bolt Hole Count           : " + CrankWheel.boltHoleCount + "\n";
+    t += "  Bolt Hole Circle Diameter : " + CrankWheel.boltHoleCircleDiameter + "\n";
+    t += "  Bolt Hole Diameter        : " + CrankWheel.boltHoleDiameter + "\n";
+    t += "  Bolt Pattern Rotate       : " + CrankWheel.boltPatternRotate + "\n";
+    t += "Bolt Hole Pattern 2" + "\n";
+    t += "  Bolt Hole Count           : " + CrankWheel.boltHoleCount2 + "\n";
+    t += "  Bolt Hole Circle Diameter : " + CrankWheel.boltHoleCircleDiameter2 + "\n";
+    t += "  Bolt Hole Diameter        : " + CrankWheel.boltHoleDiameter2 + "\n";
+    t += "  Bolt Pattern Rotate       : " + CrankWheel.boltPatternRotate2 + "\n";
+    return t;
 }
 
 // Set up any needed start up 'stuff'. Right
@@ -98,10 +124,10 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.wheelDiameter = v.getValue();
 
-    /* QSpinBox - Integer */
+    // QSpinBox
     CrankWheel.numberOfTeeth = CrankWheel.widgets["NumberOfTeeth"].value;
 
-    /* QSpinBox - Integer */
+    // QSpinBox
     CrankWheel.missingTeeth = CrankWheel.widgets["MissingTeeth"].value;
 
     v = CrankWheel.widgets["ToothWidth"];
@@ -122,7 +148,7 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.centerHoleDiameter = v.getValue();
 
-    /* QSpinBox */
+    // QSpinBox
     CrankWheel.numberOfSpokes = CrankWheel.widgets["NumberOfSpokes"].value;
 
     v = CrankWheel.widgets["SpokeRatio"];
@@ -143,7 +169,7 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.rimRatio = v.getValue();
 
-    /* QSpinBox */
+    // QSpinBox
     CrankWheel.boltHoleCount = CrankWheel.widgets["BoltHoleCount"].value;
 
     v = CrankWheel.widgets["BoltHoleCircleDiameter"];
@@ -164,7 +190,7 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.boltPatternRotate = v.getValue();
 
-    /* QSpinBox */
+    // QSpinBox
     CrankWheel.boltHoleCount2 = CrankWheel.widgets["BoltHoleCount2"].value;
 
     v = CrankWheel.widgets["BoltHoleCircleDiameter2"];
@@ -185,6 +211,13 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.boltPatternRotate2 = v.getValue();
 
+
+    // QCheckBox
+    CrankWheel.showLegend = CrankWheel.widgets["ShowLegend"].checked;
+
+    // QCheckBox
+    CrankWheel.showDebug = CrankWheel.widgets["ShowDebug"].checked;
+
     // At this point generate the wheel. Prior to this
     // some validation could be done to prevent invalid
     // wheels due to params.
@@ -196,7 +229,14 @@ CrankWheel.generate = function (di, file) {
 // params are just used, may be better to reset them here,
 // always but may not matter (user changes var in the class etc.)
 CrankWheel.generatePreview = function (di, iconSize) {
-    return CrankWheel.getOperation(di);
+
+    // Save the legend state so we can disable it for the preview
+    var saveLegendState = CrankWheel.showLegend;
+    CrankWheel.showLegend = false;
+    var ret = CrankWheel.getOperation(di);
+    CrankWheel.showLegend = saveLegendState;
+
+    return ret;
 }
 
 // Helper Funcs
@@ -253,14 +293,6 @@ CrankWheel.getOperation = function (di) {
 
     // di is the interface not the doc, so get the doc as we need that
     var document = di.getDocument();
-
-    // DEBUG - draw circle markers by un-commenting code below
-
-    // var wheelCircleData = new RCircleData(center, wheelRadius);
-    // addOperation.addObject(new RCircleEntity(document, wheelCircleData));
-
-    // var wheelPitchData = new RCircleData(center, pitchCircleRadius);
-    // addOperation.addObject(new RCircleEntity(document, wheelPitchData));
 
     // Draw the center of the wheel if not 0
     if (centerHoleRadius) {
@@ -386,6 +418,73 @@ CrankWheel.getOperation = function (di) {
             }
         }
     }
-    // Add it to the drawing
+
+    // Draw the info block, offset to right of wheel
+
+    if (CrankWheel.showLegend) {
+        var wheelLegend = CrankWheel.getLegendStr();
+        textPos = new RVector([wheelRadius + wheelRadius * 0.1, wheelRadius]);
+
+        var text = new RTextEntity(
+            document,
+            new RTextData(
+                textPos,            // position
+                textPos,            // alignment point
+                0.15,               // height
+                1.0,                // text width (ignored for now)
+                RS.VAlignTop,       // alignments
+                RS.HAlignLeft,
+                RS.LeftToRight,
+                RS.Exact,
+                1.0,                // line spacing factor
+                wheelLegend,        // the text
+                "Courier",          // font fixed spacing is nicer here
+                false,              // bold
+                false,              // italic
+                0.0,                // angle
+                false               // simple text without formatting
+            )
+        );
+        addOperation.addObject(text);
+    }
+
+    // draw anything needed in debug mode
+
+    if (CrankWheel.showDebug) {
+        // Wheels outer diameter
+        var wheelCircleData = new RCircleData(center, wheelRadius);
+        addOperation.addObject(new RCircleEntity(document, wheelCircleData));
+
+        // tooth inner root circle
+        var wheelPitchData = new RCircleData(center, pitchCircleRadius);
+        addOperation.addObject(new RCircleEntity(document, wheelPitchData));
+
+        // if we are drawing bolt holes draw that circle
+        if (CrankWheel.boltHoleCount) {
+            var boltPitchData = new RCircleData(center, CrankWheel.boltHoleCircleDiameter / 2.0);
+            addOperation.addObject(new RCircleEntity(document, boltPitchData));
+        }
+
+        // same for second set of bolt holes
+        if (CrankWheel.boltHoleCount2) {
+            var boltPitchData2 = new RCircleData(center, CrankWheel.boltHoleCircleDiameter2 / 2.0);
+            addOperation.addObject(new RCircleEntity(document, boltPitchData2));
+        }
+
+        // now spoke boundries (inner and outer) if being drawn
+
+        // same for second set of bolt holes
+        if (CrankWheel.numberOfSpokes) {
+            var spokeInnerData = new RCircleData(center, r0);
+            addOperation.addObject(new RCircleEntity(document, spokeInnerData));
+        }
+        // same for second set of bolt holes
+        if (CrankWheel.numberOfSpokes) {
+            var spokeInnerData2 = new RCircleData(center, r1);
+            addOperation.addObject(new RCircleEntity(document, spokeInnerData2));
+        }
+    }
+
+    // Add it all to the drawing
     return addOperation;
 }
