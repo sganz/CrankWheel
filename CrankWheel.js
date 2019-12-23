@@ -262,9 +262,11 @@ CrankWheel.getOperation = function (di) {
     // var wheelPitchData = new RCircleData(center, pitchCircleRadius);
     // addOperation.addObject(new RCircleEntity(document, wheelPitchData));
 
-    // Draw the center of the wheel
-    var centerHoleData = new RCircleData(center, centerHoleRadius);
-    addOperation.addObject(new RCircleEntity(document, centerHoleData));
+    // Draw the center of the wheel if not 0
+    if (centerHoleRadius) {
+        var centerHoleData = new RCircleData(center, centerHoleRadius);
+        addOperation.addObject(new RCircleEntity(document, centerHoleData));
+    }
 
     // now the first bolt pattern
     generateBoltPattern(
@@ -343,47 +345,47 @@ CrankWheel.getOperation = function (di) {
     // need to figure out how the the arc diameter and connect it as the last thing IF any missing teeth. OR
     // just not draw the regular tooth but create another td that has just the same arc at the root
     // repeated 2x
-
-
     addOperation.addObject(new RPolylineEntity(document, new RPolylineData(wheel)));
 
-    //return addOperation;
+    // Make spokes/slots. A nice enhancement would be to do this will
+    // fillets on the edges instead of angles to make is smoother
+    // looking. Easy to do in QCAD, not sure how to do here just yet.
+    // Some math involved from Iain's original work. I'm bad with math
+    // so someone may have to help here if generating different shapes
+    // or smoother corners.
 
-    /* make spokes, if required and is possible */
-    //if (CrankWheel.numberOfSpokes > 0 && CrankWheel.centerHoleDiameter > 0) {
-    {
-        var spokeAngle = 2 * Math.PI / CrankWheel.numberOfSpokes;
+    // Check for a few odd conditions to ensure will draw OK
 
-        // inner spoke hole line
-        var r0 = 2.0; // CrankWheel.hubRatio * CrankWheel.centerHoleDiameter;
-        var a0 = Math.asin(CrankWheel.spokeRatio / (r0 * 2));
+    if (CrankWheel.numberOfSpokes > 0) {
+        {
+            var spokeAngle = 2 * Math.PI / CrankWheel.numberOfSpokes;
 
-        // outer spoke hole line
-        var r1 = 2.5; // CrankWheel.rimRatio * pitchCircleRadius;
-        var a1 = Math.asin(CrankWheel.spokeRatio / (r1 * 2));
+            // inner spoke hole line
+            var r0 = 2.0; // Need to come from user
+            var a0 = Math.asin(CrankWheel.spokeRatio / (r0 * 2));
 
-        var hole = new RPolyline();
-        hole.setClosed(true);
+            // outer spoke hole line
+            var r1 = 2.5; // Need to come from user
+            var a1 = Math.asin(CrankWheel.spokeRatio / (r1 * 2));
 
-        if (a0 > spokeAngle / 2) {
-            a0 = spokeAngle / 2;
-            r0 = (CrankWheel.spokeRatio * CrankWheel.centerHoleDiameter) / (Math.sin(a0) * 2);
-        } else {
+            var hole = new RPolyline();
+            hole.setClosed(true);
+
             hole.appendVertex(RVector.createPolar(r0, spokeAngle - a0), Math.tan((2 * a0 - spokeAngle) / 4));
-        }
+            hole.appendVertex(RVector.createPolar(r0, a0));
+            hole.appendVertex(RVector.createPolar(r1, a1), Math.tan((spokeAngle - 2 * a1) / 4));
+            hole.appendVertex(RVector.createPolar(r1, spokeAngle - a1));
 
-        hole.appendVertex(RVector.createPolar(r0, a0));
-        hole.appendVertex(RVector.createPolar(r1, a1), Math.tan((spokeAngle - 2 * a1) / 4));
-        hole.appendVertex(RVector.createPolar(r1, spokeAngle - a1));
+            //if (r0 < r1)
+            {
+                for (var n = 0; n < CrankWheel.numberOfSpokes; n++) {
+                    addOperation.addObject(new RPolylineEntity(document, new RPolylineData(hole)));
+                    hole.rotate(spokeAngle, center);
 
-        if (r0 < r1) {
-            for (var n = 0; n < CrankWheel.numberOfSpokes; n++) {
-                addOperation.addObject(new RPolylineEntity(document, new RPolylineData(hole)));
-                hole.rotate(spokeAngle, center);
-
+                }
             }
         }
     }
-
+    // Add it to the drawing
     return addOperation;
 }
