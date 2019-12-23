@@ -6,7 +6,7 @@ and sizes are used. This will help generate them and then finally modify in QCAD
 
 ## Installation
 Installation - Find your QCAD install directory, look for 'libraries/default' copy
-the folder that is typically called 'CrankWheel' in the Github repository (can extract as a zip)
+the folder that is typically called `CrankWheel` in the Github repository (can extract as a zip)
 and restart QCAD it should now show up in your library browser.
 
 You can also save the files into any directory and ADD that in your QCAD preferences. Look for that under-
@@ -43,7 +43,8 @@ bolt holes their are 2 sets, but are the same settings for either.
 - Spoke Ratio - Ratio of spoke to opening, play with this, go lower for larger counts of spokes
 - Spoke Outer Diameter - Sets the outer diameter of the spoke holes
 - Spoke Inner Diameter - Sets the inner diameter of the spoke holes, should be less then the Outer Diameter
-
+- Show Legend - Shows a text legend on the drawing with all the parameters
+- Debug - Draws any debug lines, typically circles to show layout
 
 - Tooth Width - NOT CURRENTLY SUPPORTED
 
@@ -51,7 +52,6 @@ bolt holes their are 2 sets, but are the same settings for either.
 - Possible fillets and arcs for bottom of teeth.
 - Better control of tooth width, they are currently proportioned at
 50-50 duty cycle which for low tooth count larger wheels might not be what's desired.
-- Text Block with specs of generated wheel as part of the drawing
 
 Some of the above can be easily done in QCAD with a small amount of manual work.
 
