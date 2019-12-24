@@ -49,6 +49,7 @@ bolt holes their are 2 sets, but are the same settings for either.
 - Tooth Width - NOT CURRENTLY SUPPORTED
 
 ## Todo
+- Add rotation to spokes
 - Possible fillets and arcs for bottom of teeth.
 - Better control of tooth width, they are currently proportioned at
 50-50 duty cycle which for low tooth count larger wheels might not be what's desired.
