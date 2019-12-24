@@ -62,6 +62,7 @@ CrankWheel.spokeInnerDiameter = 4.0;
 CrankWheel.spokeOuterDiameter = 5.0;
 CrankWheel.showLegend = true;
 CrankWheel.showDebug = false;
+CrankWheel.RootBulge = true;
 
 CrankWheel.prototype.toString = function () {
     print("CrankWheel.js:", "toString(): ");
@@ -315,12 +316,14 @@ CrankWheel.getOperation = function (di) {
 
     // storage for the points to draw tooths and the missing-toothed parts
 
-    var td = [];    // tooth data
-    var mtd = [];   // missing tooth data
+    var td = [];    // tooth data user selected bulge
+    var mtd = [];   // missing tooth data all nice lower arc
+    var ltd = [];   // last tooth IF bulge root is selected
 
     // Draws the tooth start points, same for both on the inner (pitchCircle)
     // and the outer. td - Outer teeth, mtd - outer missing parts
     td.push([pitchCircleRadius, 0, 0]);
+    ltd.push([pitchCircleRadius, 0, 0]);
     mtd.push([pitchCircleRadius, 0, 0]);
 
     // This draws the top of the tooth's arch and the inner missing
@@ -329,15 +332,30 @@ CrankWheel.getOperation = function (di) {
     const outsideAngle = 0;
     const outsideBulge = Math.tan(((toothAngle / 2) - (outsideAngle * 2)) / 4);
     td.push([wheelRadius, outsideAngle, outsideBulge]);
+    ltd.push([wheelRadius, outsideAngle, outsideBulge]);
     mtd.push([pitchCircleRadius, outsideAngle, outsideBulge]);  // save the pattern for the bottom (root) not a top
 
-    // Draw the back side of the tooth point
+    // Draw the back side of the tooth point, lower point down
     td.push([td[1][0], (toothAngle / 2) - td[1][1], 0]);
+    ltd.push([td[1][0], (toothAngle / 2) - td[1][1], 0]);
 
     // This is the bottom gulley (root) of each tooth. Will be the
     // same for regular tooth or missing tooth
     const rootBulge = Math.tan(((toothAngle / 2) - td[0][1]) / 4);
-    td.push([td[0][0], (toothAngle / 2) - td[0][1], rootBulge]);
+
+    // Bulge notes
+    // Setting the rootBulge in td to -1 will do the perfect semi-circle on the
+    // bottom of the tooth. However the last tooth then has a semi-circle to the
+    // mtd lower radius arc which is odd. So for the last td tooth, it needs to be
+    // swapped with a pattern of regular tooth, regular radius bulge so
+    // it can align to the missing tooth root. If no missing tooth, nothing needs
+    // to be done as all the bulges at -1  will be fine.
+
+    var userBulge = CrankWheel.RootBulge ? userBulge = -1.0 : rootBulge;
+    var noMissingBulge = CrankWheel.missingTeeth > 0 ? rootBulge : userBulge;
+
+    td.push([td[0][0], (toothAngle / 2) - td[0][1], userBulge]);
+    ltd.push([td[0][0], (toothAngle / 2) - td[0][1], noMissingBulge]);
     mtd.push([td[0][0], (toothAngle / 2) - td[0][1], rootBulge]);
 
     // Construct the wheel here with teeth as previously created.
@@ -350,13 +368,28 @@ CrankWheel.getOperation = function (di) {
     wheel.setClosed(true);
     for (var i = 0; i < CrankWheel.numberOfTeeth; i++) {
 
+        // logic here might be if a missing tooth cnt > 0 always the last tooth is drawn with
+        // a regular arc (bulge), then the mtd will always connect. Might go with td, mtd, nonBulgeLastTooth
+        // when assembling the array, and pick which is needed based on settings and missing tooth.
+        // Also last tooth may always be OK to have with regular arcs, that way mtd always workds
+
+        // if numofTeeth - missing teeth - 1 draw as normal
+        // else if numofteeth - missingteeth draw as final tooth with normal arc (not bulge)
+        // else draw the mtd to wrap it all up.
+
         // Draw each complete tooth here, or missing tooth depending on count
-        if (i < CrankWheel.numberOfTeeth - CrankWheel.missingTeeth) {
+        if (i < CrankWheel.numberOfTeeth - CrankWheel.missingTeeth - 1) {
             for (var n = 0; n < td.length; n++) {
                 wheel.appendVertex(RVector.createPolar(td[n][0], (i * toothAngle) + td[n][1]), td[n][2]);
             }
         }
-        else {
+        else if (i < CrankWheel.numberOfTeeth - CrankWheel.missingTeeth) {
+            // last tooth before missing teeth if any, won't be here otherwise
+            for (var j = 0; j < ltd.length; j++) {
+                wheel.appendVertex(RVector.createPolar(ltd[j][0], (i * toothAngle) + ltd[j][1]), ltd[j][2]);
+            }
+        } else {
+            // only will be here if Missing any teeth
             // draw missing parts typically 3 for each missing tooth
             for (var j = 0; j < mtd.length; j++) {
                 wheel.appendVertex(RVector.createPolar(mtd[j][0], (i * toothAngle) + mtd[j][1]), mtd[j][2]);
