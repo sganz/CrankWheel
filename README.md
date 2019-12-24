@@ -50,7 +50,9 @@ bolt holes their are 2 sets, but are the same settings for either.
 
 ## Todo
 - Add rotation to spokes
-- Possible fillets and arcs for bottom of teeth.
+- Possible reverse arcs for bottom of teeth. This seems like a bulge of -1 set for
+the inner arc will flip it around and do the deed. Apply the -1 bulge to regular tooth
+roots. QCAD made this easy, just need to add options for FANCY WHEEL and implement the UI
 - Better control of tooth width, they are currently proportioned at
 50-50 duty cycle which for low tooth count larger wheels might not be what's desired.
 - Compute area of a tooth and use that with some fancy math to generate a balance hole at some radius
