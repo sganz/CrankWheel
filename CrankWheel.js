@@ -25,18 +25,6 @@
  *               and sizes are used. This will help generate them and
  *               then finally modify in QCAD.
  *
- * Versions
- * 1.0 - Begat first working-ish version
- *
- * Todo
- * Possible fillets and arcs for bottom of teeth.
- * Better control of tooth width, they are currently proportioned at
- * a 50-50 duty cycle which for low tooth count larger wheels
- * might not be what's desired.
- * Text Block with specs of generated wheel as part of the drawing
- *
- * Some of the above can be easily done in QCAD with a small amount of
- * manual work.
  *
  * Make changes, fork, or open a Pull Request and I'll integrate any changes
  *
@@ -50,11 +38,16 @@
 function CrankWheel() {
 }
 
-// Set up default values, all angle in DEGREES
+// Set up default values, all angle in DEGREES. Most defaults
+// get loaded from the UI, these are just in case needed for
+// things like drawing the preview
 
 CrankWheel.wheelDiameter = 6.75;
+CrankWheel.numberOfTeeth = 36;
+CrankWheel.missingTeeth = 1;
 CrankWheel.toothWidth = 0.25;
 CrankWheel.toothHeight = 0.25;
+CrankWheel.centerHoleDiameter = 1.0;
 CrankWheel.boltHoleCount = 3;
 CrankWheel.boltHoleCircleDiameter = 2.5;
 CrankWheel.boltHoleDiameter = 0.375;
@@ -63,13 +56,10 @@ CrankWheel.boltHoleCount2 = 5;
 CrankWheel.boltHoleCircleDiameter2 = 4.0;
 CrankWheel.boltHoleDiameter2 = 0.375;
 CrankWheel.boltPatternRotate2 = 60;
-CrankWheel.numberOfTeeth = 36;
-CrankWheel.missingTeeth = 1;
 CrankWheel.numberOfSpokes = 0;
 CrankWheel.spokeRatio = 1.0;
-CrankWheel.hubRatio = 1.5;
-CrankWheel.rimRatio = 0.8;
-CrankWheel.centerHoleDiameter = 1.0;
+CrankWheel.spokeInnerDiameter = 4.0;
+CrankWheel.spokeOuterDiameter = 5.0;
 CrankWheel.showLegend = true;
 CrankWheel.showDebug = false;
 
@@ -117,6 +107,7 @@ CrankWheel.generate = function (di, file) {
 
     // if not specified all numeric inputs are of RMathLineEdit class
     // which can't be edited in the Qt Designer as a side note.
+    // Also any missing widgets will fail and cause no drawing!
 
     var v = CrankWheel.widgets["WheelDiameter"];
     if (!v.isValid()) {
@@ -157,17 +148,17 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.spokeRatio = v.getValue();
 
-    v = CrankWheel.widgets["HubRatio"];
+    v = CrankWheel.widgets["SpokeInnerDiameter"];
     if (!v.isValid()) {
         return undefined;
     }
-    CrankWheel.hubRatio = v.getValue();
+    CrankWheel.spokeInnerDiameter = v.getValue();
 
-    v = CrankWheel.widgets["RimRatio"];
+    v = CrankWheel.widgets["SpokeOuterDiameter"];
     if (!v.isValid()) {
         return undefined;
     }
-    CrankWheel.rimRatio = v.getValue();
+    CrankWheel.spokeOuterDiameter = v.getValue();
 
     // QSpinBox
     CrankWheel.boltHoleCount = CrankWheel.widgets["BoltHoleCount"].value;
@@ -393,11 +384,11 @@ CrankWheel.getOperation = function (di) {
             var spokeAngle = 2 * Math.PI / CrankWheel.numberOfSpokes;
 
             // inner spoke hole line
-            var r0 = 2.0; // Need to come from user
+            var r0 = CrankWheel.spokeInnerDiameter / 2.0;
             var a0 = Math.asin(CrankWheel.spokeRatio / (r0 * 2));
 
             // outer spoke hole line
-            var r1 = 2.5; // Need to come from user
+            var r1 = CrankWheel.spokeOuterDiameter / 2.0;
             var a1 = Math.asin(CrankWheel.spokeRatio / (r1 * 2));
 
             var hole = new RPolyline();
@@ -471,7 +462,7 @@ CrankWheel.getOperation = function (di) {
             addOperation.addObject(new RCircleEntity(document, boltPitchData2));
         }
 
-        // now spoke boundries (inner and outer) if being drawn
+        // now spoke boundaries (inner and outer) if being drawn
 
         // same for second set of bolt holes
         if (CrankWheel.numberOfSpokes) {
