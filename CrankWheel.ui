@@ -152,6 +152,13 @@
                     </property>
                 </widget>
             </item>
+            <item row="7" column="0">
+                <widget class="QLabel" name="lblNumberOfSpokes">
+                    <property name="text">
+                        <string>Number Of Spokes</string>
+                    </property>
+                </widget>
+            </item>
             <item row="7" column="1">
                 <widget class="QSpinBox" name="NumberOfSpokes">
                     <property name="toolTip">
@@ -162,13 +169,6 @@
                     </property>
                     <property name="value">
                         <number>3</number>
-                    </property>
-                </widget>
-            </item>
-            <item row="7" column="0">
-                <widget class="QLabel" name="lblNumberOfSpokeRatio">
-                    <property name="text">
-                        <string>Number Of Spokes</string>
                     </property>
                 </widget>
             </item>
@@ -183,7 +183,7 @@
             <item row="8" column="1">
                 <widget class="RMathLineEdit" name="SpokeRatio">
                     <property name="text">
-                        <string>1.25</string>
+                        <string>1.0</string>
                     </property>
                     <property name="angle">
                         <bool>false</bool>
@@ -191,20 +191,20 @@
                     <property name="defaultValue" stdset="0">
                         <double>0.000000000000000</double>
                     </property>
-                </widget>
+                </widget>s
             </item>
 
             <item row="9" column="0">
-                <widget class="QLabel" name="lblHubRatio">
+                <widget class="QLabel" name="lblSpokeInnerDiameter">
                     <property name="text">
-                        <string>Hub Ratio</string>
+                        <string>Spoke Inner Diameter</string>
                     </property>
                 </widget>
             </item>
             <item row="9" column="1">
-                <widget class="RMathLineEdit" name="HubRatio">
+                <widget class="RMathLineEdit" name="SpokeInnerDiameter">
                     <property name="text">
-                        <string>1.5</string>
+                        <string>4.0</string>
                     </property>
                     <property name="angle">
                         <bool>false</bool>
@@ -216,17 +216,17 @@
             </item>
 
             <item row="10" column="0">
-                <widget class="QLabel" name="lblRimRatio">
+                <widget class="QLabel" name="lblSpokeOuterDiameter">
                     <property name="text">
-                        <string>Rim Ratio</string>
+                        <string>Spoke Outer Diameter</string>
                     </property>
                 </widget>
             </item>
 
             <item row="10" column="1">
-                <widget class="RMathLineEdit" name="RimRatio">
+                <widget class="RMathLineEdit" name="SpokeOuterDiameter">
                     <property name="text">
-                        <string>0.8</string>
+                        <string>5.0</string>
                     </property>
                     <property name="angle">
                         <bool>false</bool>
@@ -489,7 +489,7 @@
                         <string>Draw Debug</string>
                     </property>
                     <property name="checked">
-                        <bool>true</bool>
+                        <bool>false</bool>
                     </property>
                     <property name="tristate">
                         <bool>false</bool>
