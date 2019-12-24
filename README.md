@@ -1,12 +1,13 @@
-![CrankWheel](https://user-images.githubusercontent.com/5179047/71371057-bad99380-2564-11ea-96f3-5c26d3d6fc4e.gif)
+![3 CrankWheels](https://user-images.githubusercontent.com/5179047/71425948-be9a1280-2657-11ea-8199-361e842c1843.gif)
 
 # CrankWheel
 QCAD Plugin for generation of crankshaft timing wheel. The plugin accepts many parameters to configure a wheel for computer control of your engine. The wheel generated is used for engine position indication to the engine management system. Many different configurations,
 and sizes are used. This will help generate them and then finally modify in QCAD.
 
+The wheel generator can generate a variety of styles of wheels, but the outcome of all generation can be modified to suit your needs. The basic wheel can be configured with 2 types of teeth, one where the root is an arc and one with a nicely shaped 'cup'. In addition options to configure the number of spokes and the inner and outer diameters of the voids to allow positioning as needed. The final bit is bolt hole patterns. These can be placed rotated at any angle to help with setting up your wheel.
+
 ## Installation
-Installation - Find your QCAD install directory, look for 'libraries/default' copy
-the folder that is typically called `CrankWheel` in the Github repository (can extract as a zip)
+Installation - Find your QCAD install directory, look for 'libraries/default' create and copy the files to this folder.  If you need to create a new folder, it is typically called `CrankWheel`. Copy the files in the Github repository (can extract as a zip)
 and restart QCAD it should now show up in your library browser.
 
 You can also save the files into any directory and ADD that in your QCAD preferences. Look for that under-
@@ -35,6 +36,7 @@ bolt holes their are 2 sets, but are the same settings for either.
 - Number Of Teeth - Count of teeth INCLUDING the missing teeth
 - Missing Teeth - Number of teeth that should be removed
 - Tooth Height - Height of the tooth inwards from the diameter.
+- Draw Rounded Roots - Draws the roots of the teeth rounded instead of square
 - Bolt Hole Count - Number of holes in the bolt circle
 - Bolt Hole Circle Diameter - Diameter of the bolt circle
 - Bolt HoleDiameter - Diameter of the bolt holes in the circle
@@ -50,12 +52,10 @@ bolt holes their are 2 sets, but are the same settings for either.
 
 ## Todo
 - Add rotation to spokes
-- Possible reverse arcs for bottom of teeth. This seems like a bulge of -1 set for
-the inner arc will flip it around and do the deed. Apply the -1 bulge to regular tooth
-roots. QCAD made this easy, just need to add options for FANCY WHEEL and implement the UI
 - Better control of tooth width, they are currently proportioned at
 50-50 duty cycle which for low tooth count larger wheels might not be what's desired.
 - Compute area of a tooth and use that with some fancy math to generate a balance hole at some radius
+- Add this and some examples on my site www.gtsparkplugs.com
 
 Some of the above can be easily done in QCAD with a small amount of manual work.
 
@@ -66,4 +66,4 @@ Special thanks to Iain Hibbert for his work on the Gear generator for QCAD where
 work was started from.
 
 ## License
-MIT
+MIT Code is COPYRIGHT (C) 2019 Sandy Ganz and Additional Copyright as listed in code.
