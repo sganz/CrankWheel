@@ -52,10 +52,11 @@ bolt holes their are 2 sets, but are the same settings for either.
 - Possible fillets and arcs for bottom of teeth.
 - Better control of tooth width, they are currently proportioned at
 50-50 duty cycle which for low tooth count larger wheels might not be what's desired.
+- Compute area of a tooth and use that with some fancy math to generate a balance hole at some radius
 
 Some of the above can be easily done in QCAD with a small amount of manual work.
 
-Make changes, fork, or open a Pull Request and I'll integrate any changes
+Make fork, make changes and open a Pull Request and I'll integrate any changes.
 
 You can find QCAD at www.qcad.org this is a GREAT 2D CAD package that is open sourced.
 Special thanks to Iain Hibbert for his work on the Gear generator for QCAD where this
