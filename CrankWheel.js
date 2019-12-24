@@ -43,16 +43,15 @@ function CrankWheel() {
 // things like drawing the preview
 
 CrankWheel.wheelDiameter = 6.75;
-CrankWheel.numberOfTeeth = 36;
-CrankWheel.missingTeeth = 1;
-CrankWheel.toothWidth = 0.25;
+CrankWheel.numberOfTeeth = 12;
+CrankWheel.missingTeeth = 0;
 CrankWheel.toothHeight = 0.25;
 CrankWheel.centerHoleDiameter = 1.0;
 CrankWheel.boltHoleCount = 3;
 CrankWheel.boltHoleCircleDiameter = 2.5;
 CrankWheel.boltHoleDiameter = 0.375;
 CrankWheel.boltPatternRotate = 0;
-CrankWheel.boltHoleCount2 = 5;
+CrankWheel.boltHoleCount2 = 0;
 CrankWheel.boltHoleCircleDiameter2 = 4.0;
 CrankWheel.boltHoleDiameter2 = 0.375;
 CrankWheel.boltPatternRotate2 = 60;
@@ -62,7 +61,7 @@ CrankWheel.spokeInnerDiameter = 4.0;
 CrankWheel.spokeOuterDiameter = 5.0;
 CrankWheel.showLegend = true;
 CrankWheel.showDebug = false;
-CrankWheel.RootBulge = true;
+CrankWheel.drawRoundedRoots = true;
 
 CrankWheel.prototype.toString = function () {
     print("CrankWheel.js:", "toString(): ");
@@ -122,12 +121,6 @@ CrankWheel.generate = function (di, file) {
     // QSpinBox
     CrankWheel.missingTeeth = CrankWheel.widgets["MissingTeeth"].value;
 
-    v = CrankWheel.widgets["ToothWidth"];
-    if (!v.isValid()) {
-        return undefined;
-    }
-    CrankWheel.toothWidth = v.getValue();
-
     v = CrankWheel.widgets["ToothHeight"];
     if (!v.isValid()) {
         return undefined;
@@ -139,6 +132,9 @@ CrankWheel.generate = function (di, file) {
         return undefined;
     }
     CrankWheel.centerHoleDiameter = v.getValue();
+
+    // QCheckBox
+    CrankWheel.drawRoundedRoots = CrankWheel.widgets["DrawRoundedRoot"].checked;
 
     // QSpinBox
     CrankWheel.numberOfSpokes = CrankWheel.widgets["NumberOfSpokes"].value;
@@ -351,7 +347,7 @@ CrankWheel.getOperation = function (di) {
     // it can align to the missing tooth root. If no missing tooth, nothing needs
     // to be done as all the bulges at -1  will be fine.
 
-    var userBulge = CrankWheel.RootBulge ? userBulge = -1.0 : rootBulge;
+    var userBulge = CrankWheel.drawRoundedRoots ? userBulge = -1.0 : rootBulge;
     var noMissingBulge = CrankWheel.missingTeeth > 0 ? rootBulge : userBulge;
 
     td.push([td[0][0], (toothAngle / 2) - td[0][1], userBulge]);
@@ -369,12 +365,12 @@ CrankWheel.getOperation = function (di) {
     for (var i = 0; i < CrankWheel.numberOfTeeth; i++) {
 
         // logic here might be if a missing tooth cnt > 0 always the last tooth is drawn with
-        // a regular arc (bulge), then the mtd will always connect. Might go with td, mtd, nonBulgeLastTooth
+        // a regular arc (bulge), then the mtd will always connect. Might go with td, mtd, ltd (last tooth)
         // when assembling the array, and pick which is needed based on settings and missing tooth.
-        // Also last tooth may always be OK to have with regular arcs, that way mtd always workds
+        // Also last tooth may always be OK to have with regular arcs
 
-        // if numofTeeth - missing teeth - 1 draw as normal
-        // else if numofteeth - missingteeth draw as final tooth with normal arc (not bulge)
+        // if numberOfTeeth - missingTeeth - 1 draw as normal
+        // else if numberOfTeeth - missingTeeth draw as final tooth with normal arc (not bulge)
         // else draw the mtd to wrap it all up.
 
         // Draw each complete tooth here, or missing tooth depending on count
@@ -398,9 +394,6 @@ CrankWheel.getOperation = function (di) {
         }
     }
 
-    // need to figure out how the the arc diameter and connect it as the last thing IF any missing teeth. OR
-    // just not draw the regular tooth but create another td that has just the same arc at the root
-    // repeated 2x
     addOperation.addObject(new RPolylineEntity(document, new RPolylineData(wheel)));
 
     // Make spokes/slots. A nice enhancement would be to do this will
@@ -497,12 +490,13 @@ CrankWheel.getOperation = function (di) {
 
         // now spoke boundaries (inner and outer) if being drawn
 
-        // same for second set of bolt holes
+        // draw inner circle for the spokes
         if (CrankWheel.numberOfSpokes) {
             var spokeInnerData = new RCircleData(center, r0);
             addOperation.addObject(new RCircleEntity(document, spokeInnerData));
         }
-        // same for second set of bolt holes
+
+        // same for the outers
         if (CrankWheel.numberOfSpokes) {
             var spokeInnerData2 = new RCircleData(center, r1);
             addOperation.addObject(new RCircleEntity(document, spokeInnerData2));
