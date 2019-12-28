@@ -402,46 +402,62 @@ CrankWheel.getOperation = function (di) {
         }
     }
 
+    // Draw the wheel teeth
     addOperation.addObject(new RPolylineEntity(document, new RPolylineData(wheel)));
+
+    // test code to see if I can get round corners going
+    // var p1 = new RVector(0, 0);
+    // var p2 = new RVector(10, 0);
+    // var p3 = new RVector(5, Math.sin(RMath.deg2rad(60)) * 10);
+
+    // var LineEntity1 = new RLineEntity(document, new RLineData(p1, p2));
+    // var LineEntity2 = new RLineEntity(document, new RLineData(p2, p3));
+
+    // operation.addObject(LineEntity1);
+    // operation.addObject(LineEntity2);
+    // ?? addOperation == operation ??
+    // Might have to get the array of lines from the RPolyLine object
+    // var success = Round.round(operation, LineEntity1, p1, LineEntity2, p3, true, 1.5, false);
+
 
     // Make spokes. A nice enhancement would be to do this will
     // fillets on the edges instead of angles to make is smoother
     // looking. Easy to do in QCAD, not sure how to do here just yet.
 
-    if (CrankWheel.numberOfSpokes > 0) {
-        {
-            var spokeAngle = 2 * Math.PI / CrankWheel.numberOfSpokes;
+    if (CrankWheel.numberOfSpokes > 0 && CrankWheel.spokeInnerDiameter > 0.0
+        && CrankWheel.spokeOuterDiameter > CrankWheel.spokeInnerDiameter) {
 
-            // inner spoke hole line
-            var r0 = CrankWheel.spokeInnerDiameter / 2.0;
-            var a0 = Math.asin(CrankWheel.spokeRatio / (r0 * 2.0));
+        var spokeAngle = 2 * Math.PI / CrankWheel.numberOfSpokes;
 
-            // outer spoke hole line
-            var r1 = CrankWheel.spokeOuterDiameter / 2.0;
-            var a1 = Math.asin(CrankWheel.spokeRatio / (r1 * 2.0));
+        // inner spoke hole line
+        var r0 = CrankWheel.spokeInnerDiameter / 2.0;
+        var a0 = Math.asin(CrankWheel.spokeRatio / (r0 * 4.0));
 
-            // gets the starting angle and offset
-            var spokeAngleOffset = spokeAngle + RMath.deg2rad(CrankWheel.spokeRotation);
+        // outer spoke hole line
+        var r1 = CrankWheel.spokeOuterDiameter / 2.0;
+        var a1 = Math.asin(CrankWheel.spokeRatio / (r1 * 4.0));
 
-            // draw spokes one at a time like the tooths
-            for (var i = 0; i < CrankWheel.numberOfSpokes; i++) {
+        // gets the starting angle and offset
+        var spokeAngleOffset = spokeAngle + RMath.deg2rad(CrankWheel.spokeRotation);
 
-                // create each new spoke hole
-                hole = new RPolyline();
-                hole.setClosed(true);
+        // draw spokes one at a time like the tooths
+        for (var i = 0; i < CrankWheel.numberOfSpokes; i++) {
 
-                // draw each slot as a closed object
-                hole.appendVertex(RVector.createPolar(r0, (spokeAngle - a0) + spokeAngleOffset), Math.tan((2 * a0 - spokeAngle) / 4));
-                hole.appendVertex(RVector.createPolar(r0, a0 + spokeAngleOffset));
-                hole.appendVertex(RVector.createPolar(r1, a1 + spokeAngleOffset), Math.tan((spokeAngle - 2 * a1) / 4));
-                hole.appendVertex(RVector.createPolar(r1, (spokeAngle - a1) + spokeAngleOffset));
+            // create each new spoke hole
+            hole = new RPolyline();
+            hole.setClosed(true);
 
-                // once all created add and draw
-                addOperation.addObject(new RPolylineEntity(document, new RPolylineData(hole)));
+            // draw each slot as a closed object
+            hole.appendVertex(RVector.createPolar(r0, (spokeAngle - a0) + spokeAngleOffset), Math.tan((2.0 * a0 - spokeAngle) / 4.0));
+            hole.appendVertex(RVector.createPolar(r0, a0 + spokeAngleOffset));
+            hole.appendVertex(RVector.createPolar(r1, a1 + spokeAngleOffset), Math.tan((spokeAngle - 2.0 * a1) / 4.0));
+            hole.appendVertex(RVector.createPolar(r1, (spokeAngle - a1) + spokeAngleOffset));
 
-                // nudge the angle along to rotate things around
-                spokeAngleOffset += spokeAngle;
-            }
+            // once all created add and draw
+            addOperation.addObject(new RPolylineEntity(document, new RPolylineData(hole)));
+
+            // nudge the angle along to rotate things around
+            spokeAngleOffset += spokeAngle;
         }
     }
 
