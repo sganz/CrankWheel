@@ -40,7 +40,8 @@ function CrankWheel() {
 
 // Set up default values, all angle in DEGREES. Most defaults
 // get loaded from the UI, these are just in case needed for
-// things like drawing the preview
+// things like drawing the preview, after that they all come
+// from the UI
 
 CrankWheel.wheelDiameter = 6.75;
 CrankWheel.numberOfTeeth = 12;
@@ -59,18 +60,19 @@ CrankWheel.numberOfSpokes = 0;
 CrankWheel.spokeRatio = 1.0;
 CrankWheel.spokeInnerDiameter = 4.0;
 CrankWheel.spokeOuterDiameter = 5.0;
+CrankWheel.spokeRotation = 0.0;
 CrankWheel.showLegend = true;
 CrankWheel.showDebug = false;
 CrankWheel.drawRoundedRoots = true;
 
 CrankWheel.prototype.toString = function () {
     print("CrankWheel.js:", "toString(): ");
-}
+};
 
 // Build a string for the legend. This uses the class vars
 CrankWheel.getLegendStr = function () {
     var t = "";
-    t += "Wheel Diameter       : " + CrankWheel.wheelDiameter + "\n"
+    t += "Wheel Diameter       : " + CrankWheel.wheelDiameter + "\n";
     t += "Tooth Count          : " + CrankWheel.numberOfTeeth + "\n";
     t += "Missing Teeth        : " + CrankWheel.missingTeeth + "\n";
     t += "Tooth Height         : " + CrankWheel.toothHeight + "\n";
@@ -78,6 +80,7 @@ CrankWheel.getLegendStr = function () {
     t += "Number of Spokes     : " + CrankWheel.numberOfSpokes + "\n";
     t += "Number of Spokes     : " + CrankWheel.numberOfSpokes + "\n";
     t += "Spoke Ratio          : " + CrankWheel.spokeRatio + "\n";
+    t += "Spoke Rotation       : " + CrankWheel.spokeRotation + "\n";
     t += "Bolt Hole Pattern 1" + "\n";
     t += "  Bolt Hole Count           : " + CrankWheel.boltHoleCount + "\n";
     t += "  Bolt Hole Circle Diameter : " + CrankWheel.boltHoleCircleDiameter + "\n";
@@ -89,7 +92,7 @@ CrankWheel.getLegendStr = function () {
     t += "  Bolt Hole Diameter        : " + CrankWheel.boltHoleDiameter2 + "\n";
     t += "  Bolt Pattern Rotate       : " + CrankWheel.boltPatternRotate2 + "\n";
     return t;
-}
+};
 
 // Set up any needed start up 'stuff'. Right
 // now grabs the match CrankWheel.ui and loads
@@ -157,6 +160,12 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.spokeOuterDiameter = v.getValue();
 
+    v = CrankWheel.widgets["SpokeRotation"];
+    if (!v.isValid()) {
+        return undefined;
+    }
+    CrankWheel.spokeRotation = v.getValue();
+
     // QSpinBox
     CrankWheel.boltHoleCount = CrankWheel.widgets["BoltHoleCount"].value;
 
@@ -211,7 +220,7 @@ CrankWheel.generate = function (di, file) {
     // wheels due to params.
 
     return CrankWheel.getOperation(di);
-}
+};
 
 // Called to display the small icon of the wheel. Default
 // params are just used, may be better to reset them here,
@@ -225,7 +234,7 @@ CrankWheel.generatePreview = function (di, iconSize) {
     CrankWheel.showLegend = saveLegendState;
 
     return ret;
-}
+};
 
 // Helper Funcs
 
@@ -390,20 +399,14 @@ CrankWheel.getOperation = function (di) {
             for (var j = 0; j < mtd.length; j++) {
                 wheel.appendVertex(RVector.createPolar(mtd[j][0], (i * toothAngle) + mtd[j][1]), mtd[j][2]);
             }
-
         }
     }
 
     addOperation.addObject(new RPolylineEntity(document, new RPolylineData(wheel)));
 
-    // Make spokes/slots. A nice enhancement would be to do this will
+    // Make spokes. A nice enhancement would be to do this will
     // fillets on the edges instead of angles to make is smoother
     // looking. Easy to do in QCAD, not sure how to do here just yet.
-    // Some math involved from Iain's original work. I'm bad with math
-    // so someone may have to help here if generating different shapes
-    // or smoother corners.
-
-    // Check for a few odd conditions to ensure will draw OK
 
     if (CrankWheel.numberOfSpokes > 0) {
         {
@@ -411,27 +414,33 @@ CrankWheel.getOperation = function (di) {
 
             // inner spoke hole line
             var r0 = CrankWheel.spokeInnerDiameter / 2.0;
-            var a0 = Math.asin(CrankWheel.spokeRatio / (r0 * 2));
+            var a0 = Math.asin(CrankWheel.spokeRatio / (r0 * 2.0));
 
             // outer spoke hole line
             var r1 = CrankWheel.spokeOuterDiameter / 2.0;
-            var a1 = Math.asin(CrankWheel.spokeRatio / (r1 * 2));
+            var a1 = Math.asin(CrankWheel.spokeRatio / (r1 * 2.0));
 
-            var hole = new RPolyline();
-            hole.setClosed(true);
+            // gets the starting angle and offset
+            var spokeAngleOffset = spokeAngle + RMath.deg2rad(CrankWheel.spokeRotation);
 
-            hole.appendVertex(RVector.createPolar(r0, spokeAngle - a0), Math.tan((2 * a0 - spokeAngle) / 4));
-            hole.appendVertex(RVector.createPolar(r0, a0));
-            hole.appendVertex(RVector.createPolar(r1, a1), Math.tan((spokeAngle - 2 * a1) / 4));
-            hole.appendVertex(RVector.createPolar(r1, spokeAngle - a1));
+            // draw spokes one at a time like the tooths
+            for (var i = 0; i < CrankWheel.numberOfSpokes; i++) {
 
-            //if (r0 < r1)
-            {
-                for (var n = 0; n < CrankWheel.numberOfSpokes; n++) {
-                    addOperation.addObject(new RPolylineEntity(document, new RPolylineData(hole)));
-                    hole.rotate(spokeAngle, center);
+                // create each new spoke hole
+                hole = new RPolyline();
+                hole.setClosed(true);
 
-                }
+                // draw each slot as a closed object
+                hole.appendVertex(RVector.createPolar(r0, (spokeAngle - a0) + spokeAngleOffset), Math.tan((2 * a0 - spokeAngle) / 4));
+                hole.appendVertex(RVector.createPolar(r0, a0 + spokeAngleOffset));
+                hole.appendVertex(RVector.createPolar(r1, a1 + spokeAngleOffset), Math.tan((spokeAngle - 2 * a1) / 4));
+                hole.appendVertex(RVector.createPolar(r1, (spokeAngle - a1) + spokeAngleOffset));
+
+                // once all created add and draw
+                addOperation.addObject(new RPolylineEntity(document, new RPolylineData(hole)));
+
+                // nudge the angle along to rotate things around
+                spokeAngleOffset += spokeAngle;
             }
         }
     }
@@ -440,6 +449,8 @@ CrankWheel.getOperation = function (di) {
 
     if (CrankWheel.showLegend) {
         var wheelLegend = CrankWheel.getLegendStr();
+
+        // calculate the position to the right of the wheel
         textPos = new RVector([wheelRadius + wheelRadius * 0.1, wheelRadius]);
 
         var text = new RTextEntity(
@@ -505,4 +516,4 @@ CrankWheel.getOperation = function (di) {
 
     // Add it all to the drawing
     return addOperation;
-}
+};
