@@ -43,15 +43,16 @@ bolt holes their are 2 sets, but are the same settings for either.
 - Bolt PatternRotate - Rotate the bolt hole patter some degrees, default is 0
 - Number Of Spokes - Number of spokes. Spoke ratio may have to go down as Number of Spokes increases. These settings are more aesthetic at this point and take some playing to get the desired affect.
 - Spoke Ratio - Ratio of spoke to opening, play with this, go lower for larger counts of spokes
-- Spoke Outer Diameter - Sets the outer diameter of the spoke holes
 - Spoke Inner Diameter - Sets the inner diameter of the spoke holes, should be less then the Outer Diameter
+- Spoke Outer Diameter - Sets the outer diameter of the spoke holes
+- Spoke Rotation - Rotates the spoke pattern some degrees, default is 0
 - Show Legend - Shows a text legend on the drawing with all the parameters
 - Debug - Draws any debug lines, typically circles to show layout
 
 - Tooth Width - NOT CURRENTLY SUPPORTED
 
 ## Todo
-- Add rotation to spokes
+- Add Round operation on spoke holes, easily done manually, but would be nice to do in the script
 - Better control of tooth width, they are currently proportioned at
 50-50 duty cycle which for low tooth count larger wheels might not be what's desired.
 - Compute area of a tooth and use that with some fancy math to generate a balance hole at some radius
