@@ -20,13 +20,21 @@ and add the directory where you stashed the CrankWheel files to the list.
 Start QCAD and use the library browser to find the CrankWheel directory. Click into that folder (depending on how you saved the files) on the CrankWheel icon. That should bring up a new panel
 with a bunch of parameters. If you are new to QCAD the way it works is as soon as you drag your mouse into the drawing area you will see the rendered wheel. You can just move the cursor back to the parameter panel and change things like Tooth Count, add bolt holes and just move your mouse back into the drawing area to see changes. ONCE you are satisfied, just click the mouse into the drawing area to make it stick.
 
+### Error Conditions
+If you enter invalid values you may get to see some odd drawings. Check your data if you you see things that don't look right. Also some configurations will never draw correctly, an example will be a low tooth count wheel when drawn with rounded roots options set.
+
 *Note : To be clear once the wheel is drawn, you can't change parameters, so if you don't like what you just created, delete it and start over.*
 
-At this point you can modify the drawing as needed. You may want to select the parts of the wheel you might be working on first and use the Explode Block command (XP). This will allow you to work in any individual segment or part of the wheel.
+### Tips
+You can modify the drawing as needed. You may want to select the parts of the wheel you might be working on first and use the Explode Block command (XP). This will allow you to work in any individual segment or part of the wheel.
+
+You can't rotate the tooth pattern, but everything else can be. Make sure you can align your wheel based on the bolt hole locations. In many cases you can have multiple patterns at different angles or if you have a 3 bolt balancer you can set the hole count to 9 or 12 and have a lot of flexibility for positioning the wheel against your pickup.
+
+Tooth width will depend on your sensor (Hall or VR) look at the datasheet for it and look for tooth specifications.
 
 If you change some parameters to cause an error condition, generally the wheel will not be displayed as you drag the mouse into the drawing area. If you see this you may have an invalid setting.
 
-### Configurable Items
+## Configurable Items
 All default measurements are in inches, and degrees. If you are running
 QCAD in metric just change the values in the parameter dialog to be what you need. For
 bolt holes their are 2 sets, but are the same settings for either.
@@ -35,7 +43,8 @@ bolt holes their are 2 sets, but are the same settings for either.
 - Center Hole Diameter - Center hole of the wheel, set to 0 if no hole desired
 - Number Of Teeth - Count of teeth INCLUDING the missing teeth
 - Missing Teeth - Number of teeth that should be removed
-- Tooth Height - Height of the tooth inwards from the diameter.
+- Tooth Height - Height of the tooth inwards from the diameter
+- Tooth Ratio - Ratio of tooth width to space width. 0.5 would be a 50/50 spaced wheel
 - Draw Rounded Roots - Draws the roots of the teeth rounded instead of square
 - Bolt Hole Count - Number of holes in the bolt circle
 - Bolt Hole Circle Diameter - Diameter of the bolt circle
@@ -46,17 +55,13 @@ bolt holes their are 2 sets, but are the same settings for either.
 - Spoke Inner Diameter - Sets the inner diameter of the spoke holes, should be less then the Outer Diameter
 - Spoke Outer Diameter - Sets the outer diameter of the spoke holes
 - Spoke Rotation - Rotates the spoke pattern some degrees, default is 0
-- Show Legend - Shows a text legend on the drawing with all the parameters
+- Show Legend - Shows a text legend on the drawing with all the parameters (can cause drawing to slow on some machines)
 - Debug - Draws any debug lines, typically circles to show layout
-
-- Tooth Width - NOT CURRENTLY SUPPORTED
 
 ## Todo
 - Add Round operation on spoke holes, easily done manually, but would be nice to do in the script
-- Better control of tooth width, they are currently proportioned at
-50-50 duty cycle which for low tooth count larger wheels might not be what's desired.
-- Compute area of a tooth and use that with some fancy math to generate a balance hole at some radius
-- Add this and some examples on my site www.gtsparkplugs.com
+- Better error handling with warning
+- Tool tips
 
 Some of the above can be easily done in QCAD with a small amount of manual work.
 
@@ -66,5 +71,5 @@ You can find QCAD at www.qcad.org this is a GREAT 2D CAD package that is open so
 Special thanks to Iain Hibbert for his work on the Gear generator for QCAD where this
 work was started from.
 
-## License
-MIT Code is COPYRIGHT (C) 2019 Sandy Ganz and Additional Copyright as listed in code.
+## License, Warranty
+MIT Code is COPYRIGHT (C) 2019-2020 Sandy Ganz, NOT WARRANTY IS IMPLIED, USE AT YOUR OWN RISK
