@@ -371,7 +371,7 @@ CrankWheel.getOperation = function (di) {
     // it can align to the missing tooth root. If no missing tooth, nothing needs
     // to be done as all the bulges at -1  will be fine.
 
-    var userBulge = CrankWheel.drawRoundedRoots ? userBulge = -1.0 : insideBulge;
+    var userBulge = CrankWheel.drawRoundedRoots ? -1.0 : insideBulge;
     var noMissingBulge = CrankWheel.missingTeeth > 0 ? insideBulge : userBulge;
 
     td.push([pitchCircleRadius, toothAngle, userBulge]);
@@ -424,18 +424,18 @@ CrankWheel.getOperation = function (di) {
     if (CrankWheel.numberOfSpokes > 0 && CrankWheel.spokeInnerDiameter > 0.0
         && CrankWheel.spokeOuterDiameter > CrankWheel.spokeInnerDiameter) {
 
-        var spokeAngle = 2 * Math.PI / CrankWheel.numberOfSpokes;
+        const spokeAngle = 2 * Math.PI / CrankWheel.numberOfSpokes;
 
         // inner spoke hole line
-        var r0 = CrankWheel.spokeInnerDiameter / 2.0;
-        var a0 = Math.asin(CrankWheel.spokeRatio / (r0 * 4.0));
+        const r0 = CrankWheel.spokeInnerDiameter / 2.0;
+        const a0 = Math.asin(CrankWheel.spokeRatio / (r0 * 4.0));
 
         // outer spoke hole line
-        var r1 = CrankWheel.spokeOuterDiameter / 2.0;
-        var a1 = Math.asin(CrankWheel.spokeRatio / (r1 * 4.0));
+        const r1 = CrankWheel.spokeOuterDiameter / 2.0;
+        const a1 = Math.asin(CrankWheel.spokeRatio / (r1 * 4.0));
 
-        var innerSpokeBulge = Math.tan((2.0 * a0 - spokeAngle) / 4.0);
-        var outerSpokeBulge = Math.tan((spokeAngle - 2.0 * a1) / 4.0);
+        const innerSpokeBulge = Math.tan((2.0 * a0 - spokeAngle) / 4.0);
+        const outerSpokeBulge = Math.tan((spokeAngle - 2.0 * a1) / 4.0);
 
         // gets the starting angle and offset
         var spokeAngleOffset = spokeAngle + RMath.deg2rad(CrankWheel.spokeRotation);
