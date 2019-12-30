@@ -122,14 +122,40 @@
                                     </property>
                                 </widget>
                             </item>
+
                             <item row="4" column="0">
+                                <widget class="QLabel" name="lblToothRatio">
+                                    <property name="text">
+                                        <string>Tooth Ratio</string>
+                                    </property>
+                                </widget>
+                            </item>
+
+                            <item row="4" column="1">
+                                <widget class="RMathLineEdit" name="ToothRatio">
+                                    <property name="text">
+                                        <string>0.25</string>
+                                    </property>
+                                    <property name="angle">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="defaultValue" stdset="0">
+                                        <double>0.000000000000000</double>
+                                    </property>
+                                    <property name="toolTip">
+                                        <string>Tooth to space ratio, 0.5 give an even tooth to space ratio. Width of tooth depends on wheel diameter</string>
+                                    </property>
+                                </widget>
+                            </item>
+
+                            <item row="5" column="0">
                                 <widget class="QLabel" name="lblCenterHoleDiameter">
                                     <property name="text">
                                         <string>Center Hole Diameter</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="4" column="1">
+                            <item row="5" column="1">
                                 <widget class="RMathLineEdit" name="CenterHoleDiameter">
                                     <property name="text">
                                         <string>1.5</string>
@@ -142,7 +168,7 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="5" column="0">
+                            <item row="6" column="0">
                                 <widget class="QCheckBox" name="DrawRoundedRoot">
                                     <property name="text">
                                         <string>Draw Rounded Roots</string>
@@ -155,14 +181,14 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="7" column="0">
+                            <item row="8" column="0">
                                 <widget class="QLabel" name="lblNumberOfSpokes">
                                     <property name="text">
                                         <string>Number Of Spokes</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="7" column="1">
+                            <item row="8" column="1">
                                 <widget class="QSpinBox" name="NumberOfSpokes">
                                     <property name="toolTip">
                                         <string>If non-zero, spokes will be drawn</string>
@@ -176,14 +202,14 @@
                                 </widget>
                             </item>
 
-                            <item row="8" column="0">
+                            <item row="9" column="0">
                                 <widget class="QLabel" name="lblSpokeRatio">
                                     <property name="text">
                                         <string>Spoke Ratio</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="8" column="1">
+                            <item row="9" column="1">
                                 <widget class="RMathLineEdit" name="SpokeRatio">
                                     <property name="text">
                                         <string>1.75</string>
@@ -197,14 +223,14 @@
                                 </widget>s
                             </item>
 
-                            <item row="9" column="0">
+                            <item row="10" column="0">
                                 <widget class="QLabel" name="lblSpokeInnerDiameter">
                                     <property name="text">
                                         <string>Spoke Inner Diameter</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="9" column="1">
+                            <item row="10" column="1">
                                 <widget class="RMathLineEdit" name="SpokeInnerDiameter">
                                     <property name="text">
                                         <string>4.5</string>
@@ -218,7 +244,7 @@
                                 </widget>
                             </item>
 
-                            <item row="10" column="0">
+                            <item row="11" column="0">
                                 <widget class="QLabel" name="lblSpokeOuterDiameter">
                                     <property name="text">
                                         <string>Spoke Outer Diameter</string>
@@ -226,7 +252,7 @@
                                 </widget>
                             </item>
 
-                            <item row="10" column="1">
+                            <item row="11" column="1">
                                 <widget class="RMathLineEdit" name="SpokeOuterDiameter">
                                     <property name="text">
                                         <string>6.0</string>
@@ -240,7 +266,7 @@
                                 </widget>
                             </item>
 
-                            <item row="11" column="0">
+                            <item row="12" column="0">
                                 <widget class="QLabel" name="lblSpokeRotation">
                                     <property name="text">
                                         <string>Spoke Rotation</string>
@@ -248,7 +274,7 @@
                                 </widget>
                             </item>
 
-                            <item row="11" column="1">
+                            <item row="12" column="1">
                                 <widget class="RMathLineEdit" name="SpokeRotation">
                                     <property name="text">
                                         <string>15</string>
@@ -262,14 +288,14 @@
                                 </widget>
                             </item>
 
-                            <item row="13" column="0">
+                            <item row="14" column="0">
                                 <widget class="QLabel" name="lblBoltHoles">
                                     <property name="text">
                                         <string>Bolt Holes</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="13" column="1">
+                            <item row="14" column="1">
                                 <widget class="QSpinBox" name="BoltHoleCount">
                                     <property name="toolTip">
                                         <string>Number of bolt holes set 1, 0 to omit</string>
@@ -282,14 +308,14 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="14" column="0">
+                            <item row="15" column="0">
                                 <widget class="QLabel" name="lblBoltHoleCircleDiameter">
                                     <property name="text">
                                         <string>Bolt Circle Diameter</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="14" column="1">
+                            <item row="15" column="1">
                                 <widget class="RMathLineEdit" name="BoltHoleCircleDiameter">
                                     <property name="text">
                                         <string>3.3</string>
@@ -302,14 +328,14 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="15" column="0">
+                            <item row="16" column="0">
                                 <widget class="QLabel" name="lblBoltHoleDiameter">
                                     <property name="text">
                                         <string>Bolt Hole Size</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="15" column="1">
+                            <item row="16" column="1">
                                 <widget class="RMathLineEdit" name="BoltHoleDiameter">
                                     <property name="text">
                                         <string>0.375</string>
@@ -322,14 +348,14 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="16" column="0">
+                            <item row="17" column="0">
                                 <widget class="QLabel" name="lblBoltPatternRotate">
                                     <property name="text">
                                         <string>Rotate</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="16" column="1">
+                            <item row="17" column="1">
                                 <widget class="RMathLineEdit" name="BoltPatternRotate">
                                     <property name="text">
                                         <string>0.0</string>
@@ -342,14 +368,14 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="17" column="0">
+                            <item row="18" column="0">
                                 <widget class="QLabel" name="lblBoltHoles2">
                                     <property name="text">
                                         <string>Bolt Holes 2</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="17" column="1">
+                            <item row="18" column="1">
                                 <widget class="QSpinBox" name="BoltHoleCount2">
                                     <property name="toolTip">
                                         <string>Number of bolt holes set 2, 0 to omit</string>
@@ -359,14 +385,14 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="18" column="0">
+                            <item row="19" column="0">
                                 <widget class="QLabel" name="lblBoltHoleCircleDiameter2">
                                     <property name="text">
                                         <string>Bolt Circle Diameter 2</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="18" column="1">
+                            <item row="19" column="1">
                                 <widget class="RMathLineEdit" name="BoltHoleCircleDiameter2">
                                     <property name="text">
                                         <string>3.0</string>
@@ -379,14 +405,14 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="19" column="0">
+                            <item row="20" column="0">
                                 <widget class="QLabel" name="lblBoltHoleDiameter2">
                                     <property name="text">
                                         <string>Bolt Hole Size 2</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="19" column="1">
+                            <item row="20" column="1">
                                 <widget class="RMathLineEdit" name="BoltHoleDiameter2">
                                     <property name="text">
                                         <string>0.375</string>
@@ -399,14 +425,14 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="20" column="0">
+                            <item row="21" column="0">
                                 <widget class="QLabel" name="lblBoltPatternRotate2">
                                     <property name="text">
                                         <string>Rotate 2</string>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="20" column="1">
+                            <item row="21" column="1">
                                 <widget class="RMathLineEdit" name="BoltPatternRotate2">
                                     <property name="text">
                                         <string>0.0</string>
@@ -422,7 +448,7 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="6" column="0" colspan="2">
+                            <item row="7" column="0" colspan="2">
                                 <widget class="Line" name="line">
                                     <property name="sizePolicy">
                                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -459,7 +485,7 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="12" column="0" colspan="2">
+                            <item row="13" column="0" colspan="2">
                                 <widget class="Line" name="line_2">
                                     <property name="sizePolicy">
                                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -481,7 +507,7 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="21" column="0" colspan="2">
+                            <item row="22" column="0" colspan="2">
                                 <widget class="Line" name="line_3">
                                     <property name="minimumSize">
                                         <size>
@@ -497,7 +523,7 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="22" column="0">
+                            <item row="23" column="0">
                                 <widget class="QCheckBox" name="ShowLegend">
                                     <property name="text">
                                         <string>Draw Text Legend</string>
@@ -510,7 +536,7 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="22" column="1">
+                            <item row="23" column="1">
                                 <widget class="QCheckBox" name="ShowDebug">
                                     <property name="text">
                                         <string>Draw Debug</string>
