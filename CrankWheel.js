@@ -1,6 +1,5 @@
 /**
- * Copyright (c) 2019 Sandy Ganz,  Portions (c) 2016 Iain Hibbert.
- * All rights reserved.
+ * Copyright (c) 2019-2020 Sandy Ganz
  *
  * Permission to use, copy, modify, and/or distribute this software
  * for any purpose with or without fee is hereby granted, provided
@@ -47,6 +46,7 @@ CrankWheel.wheelDiameter = 6.75;
 CrankWheel.numberOfTeeth = 12;
 CrankWheel.missingTeeth = 0;
 CrankWheel.toothHeight = 0.25;
+CrankWheel.toothRatio = 0.5;
 CrankWheel.centerHoleDiameter = 1.0;
 CrankWheel.boltHoleCount = 3;
 CrankWheel.boltHoleCircleDiameter = 2.5;
@@ -76,6 +76,7 @@ CrankWheel.getLegendStr = function () {
     t += "Tooth Count          : " + CrankWheel.numberOfTeeth + "\n";
     t += "Missing Teeth        : " + CrankWheel.missingTeeth + "\n";
     t += "Tooth Height         : " + CrankWheel.toothHeight + "\n";
+    t += "Tooth Ratio          : " + CrankWheel.toothRatio + "\n";
     t += "Center Hole Diameter : " + CrankWheel.toothHeight + "\n";
     t += "Number of Spokes     : " + CrankWheel.numberOfSpokes + "\n";
     t += "Number of Spokes     : " + CrankWheel.numberOfSpokes + "\n";
@@ -91,6 +92,7 @@ CrankWheel.getLegendStr = function () {
     t += "  Bolt Hole Circle Diameter : " + CrankWheel.boltHoleCircleDiameter2 + "\n";
     t += "  Bolt Hole Diameter        : " + CrankWheel.boltHoleDiameter2 + "\n";
     t += "  Bolt Pattern Rotate       : " + CrankWheel.boltPatternRotate2 + "\n";
+
     return t;
 };
 
@@ -129,6 +131,12 @@ CrankWheel.generate = function (di, file) {
         return undefined;
     }
     CrankWheel.toothHeight = v.getValue();
+
+    v = CrankWheel.widgets["ToothRatio"];
+    if (!v.isValid()) {
+        return undefined;
+    }
+    CrankWheel.toothRatio = v.getValue();
 
     v = CrankWheel.widgets["CenterHoleDiameter"];
     if (!v.isValid()) {
@@ -323,30 +331,37 @@ CrankWheel.getOperation = function (di) {
 
     var td = [];    // tooth data user selected bulge
     var mtd = [];   // missing tooth data all nice lower arc
-    var ltd = [];   // last tooth IF bulge root is selected
+    var ltd = [];   // last tooth IF bulge root is selected needs to be different
 
     // Draws the tooth start points, same for both on the inner (pitchCircle)
-    // and the outer. td - Outer teeth, mtd - outer missing parts
+    // and the outer. td - teeth, ltd - last tooth, mtd - outer missing parts
     td.push([pitchCircleRadius, 0, 0]);
     ltd.push([pitchCircleRadius, 0, 0]);
     mtd.push([pitchCircleRadius, 0, 0]);
 
     // This draws the top of the tooth's arch and the inner missing
     // arch which is later used IF missing teeth are specified
-    const toothAngle = 2.0 * Math.PI / CrankWheel.numberOfTeeth;
-    const outsideAngle = 0;
-    const outsideBulge = Math.tan(((toothAngle / 2) - (outsideAngle * 2)) / 4);
-    td.push([wheelRadius, outsideAngle, outsideBulge]);
-    ltd.push([wheelRadius, outsideAngle, outsideBulge]);
-    mtd.push([pitchCircleRadius, outsideAngle, outsideBulge]);  // save the pattern for the bottom (root) not a top
+    const sectorAngle = 2.0 * Math.PI / CrankWheel.numberOfTeeth;
+    const percentTooth = CrankWheel.toothRatio;
+    const toothAngle = sectorAngle * percentTooth;
+    const rootAngle = sectorAngle - toothAngle;
 
-    // Draw the back side of the tooth point, lower point down
-    td.push([td[1][0], (toothAngle / 2) - td[1][1], 0]);
-    ltd.push([td[1][0], (toothAngle / 2) - td[1][1], 0]);
+    // These are the bulge factors needed for line drawing for tooth (outer) and root (inner)
+    // To compute the bulge for a specified angle it's - tan(angle/4)
+    const outsideBulge = Math.tan(toothAngle / 4.0);
+    const insideBulge = Math.tan(rootAngle / 4.0);
+
+    // draw point 2, which is the inner to outer line, continue draw with bulge
+    td.push([wheelRadius, 0, outsideBulge]);
+    ltd.push([wheelRadius, 0, outsideBulge]);
+    mtd.push([pitchCircleRadius, 0, outsideBulge]);  // save the pattern for the bottom (root) not a top
+
+    // draw point 3, which is the arch
+    td.push([wheelRadius, toothAngle, 0]); // draw end point of outer tooth, next line is a line down to pitchCircle
+    ltd.push([wheelRadius, toothAngle, 0]);
 
     // This is the bottom gulley (root) of each tooth. Will be the
     // same for regular tooth or missing tooth
-    const rootBulge = Math.tan(((toothAngle / 2) - td[0][1]) / 4);
 
     // Bulge notes
     // Setting the rootBulge in td to -1 will do the perfect semi-circle on the
@@ -356,18 +371,18 @@ CrankWheel.getOperation = function (di) {
     // it can align to the missing tooth root. If no missing tooth, nothing needs
     // to be done as all the bulges at -1  will be fine.
 
-    var userBulge = CrankWheel.drawRoundedRoots ? userBulge = -1.0 : rootBulge;
-    var noMissingBulge = CrankWheel.missingTeeth > 0 ? rootBulge : userBulge;
+    var userBulge = CrankWheel.drawRoundedRoots ? userBulge = -1.0 : insideBulge;
+    var noMissingBulge = CrankWheel.missingTeeth > 0 ? insideBulge : userBulge;
 
-    td.push([td[0][0], (toothAngle / 2) - td[0][1], userBulge]);
-    ltd.push([td[0][0], (toothAngle / 2) - td[0][1], noMissingBulge]);
-    mtd.push([td[0][0], (toothAngle / 2) - td[0][1], rootBulge]);
+    td.push([pitchCircleRadius, toothAngle, userBulge]);
+    ltd.push([td[0][0], toothAngle, noMissingBulge]);
+    mtd.push([td[0][0], toothAngle, insideBulge]);
 
     // Construct the wheel here with teeth as previously created.
-    // will need to swap teeth with other missing teeth when count > number of teeth - missing teeth.
     //
     // Roll through the list of teeth and when at the point where we need missing
-    // teeth draw that area. Now construct
+    // teeth draw that area. We have special case for the next to last tooth, and any
+    // missing teeth.
 
     wheel = new RPolyline();
     wheel.setClosed(true);
@@ -381,48 +396,30 @@ CrankWheel.getOperation = function (di) {
         // if numberOfTeeth - missingTeeth - 1 draw as normal
         // else if numberOfTeeth - missingTeeth draw as final tooth with normal arc (not bulge)
         // else draw the mtd to wrap it all up.
+        var n;
 
         // Draw each complete tooth here, or missing tooth depending on count
         if (i < CrankWheel.numberOfTeeth - CrankWheel.missingTeeth - 1) {
-            for (var n = 0; n < td.length; n++) {
-                wheel.appendVertex(RVector.createPolar(td[n][0], (i * toothAngle) + td[n][1]), td[n][2]);
+            for (n = 0; n < td.length; n++) {
+                wheel.appendVertex(RVector.createPolar(td[n][0], (i * sectorAngle) + td[n][1]), td[n][2]);
             }
         }
         else if (i < CrankWheel.numberOfTeeth - CrankWheel.missingTeeth) {
             // last tooth before missing teeth if any, won't be here otherwise
-            for (var j = 0; j < ltd.length; j++) {
-                wheel.appendVertex(RVector.createPolar(ltd[j][0], (i * toothAngle) + ltd[j][1]), ltd[j][2]);
+            for (n = 0; n < ltd.length; n++) {
+                wheel.appendVertex(RVector.createPolar(ltd[n][0], (i * sectorAngle) + ltd[n][1]), ltd[n][2]);
             }
         } else {
             // only will be here if Missing any teeth
             // draw missing parts typically 3 for each missing tooth
-            for (var j = 0; j < mtd.length; j++) {
-                wheel.appendVertex(RVector.createPolar(mtd[j][0], (i * toothAngle) + mtd[j][1]), mtd[j][2]);
+            for (var n = 0; n < mtd.length; n++) {
+                wheel.appendVertex(RVector.createPolar(mtd[n][0], (i * sectorAngle) + mtd[n][1]), mtd[n][2]);
             }
         }
     }
 
     // Draw the wheel teeth
     addOperation.addObject(new RPolylineEntity(document, new RPolylineData(wheel)));
-
-    // test code to see if I can get round corners going
-    // var p1 = new RVector(0, 0);
-    // var p2 = new RVector(10, 0);
-    // var p3 = new RVector(5, Math.sin(RMath.deg2rad(60)) * 10);
-
-    // var LineEntity1 = new RLineEntity(document, new RLineData(p1, p2));
-    // var LineEntity2 = new RLineEntity(document, new RLineData(p2, p3));
-
-    // operation.addObject(LineEntity1);
-    // operation.addObject(LineEntity2);
-    // ?? addOperation == operation ??
-    // Might have to get the array of lines from the RPolyLine object
-    // var success = Round.round(operation, LineEntity1, p1, LineEntity2, p3, true, 1.5, false);
-
-
-    // Make spokes. A nice enhancement would be to do this will
-    // fillets on the edges instead of angles to make is smoother
-    // looking. Easy to do in QCAD, not sure how to do here just yet.
 
     if (CrankWheel.numberOfSpokes > 0 && CrankWheel.spokeInnerDiameter > 0.0
         && CrankWheel.spokeOuterDiameter > CrankWheel.spokeInnerDiameter) {
@@ -437,6 +434,9 @@ CrankWheel.getOperation = function (di) {
         var r1 = CrankWheel.spokeOuterDiameter / 2.0;
         var a1 = Math.asin(CrankWheel.spokeRatio / (r1 * 4.0));
 
+        var innerSpokeBulge = Math.tan((2.0 * a0 - spokeAngle) / 4.0);
+        var outerSpokeBulge = Math.tan((spokeAngle - 2.0 * a1) / 4.0);
+
         // gets the starting angle and offset
         var spokeAngleOffset = spokeAngle + RMath.deg2rad(CrankWheel.spokeRotation);
 
@@ -448,10 +448,10 @@ CrankWheel.getOperation = function (di) {
             hole.setClosed(true);
 
             // draw each slot as a closed object
-            hole.appendVertex(RVector.createPolar(r0, (spokeAngle - a0) + spokeAngleOffset), Math.tan((2.0 * a0 - spokeAngle) / 4.0));
-            hole.appendVertex(RVector.createPolar(r0, a0 + spokeAngleOffset));
-            hole.appendVertex(RVector.createPolar(r1, a1 + spokeAngleOffset), Math.tan((spokeAngle - 2.0 * a1) / 4.0));
-            hole.appendVertex(RVector.createPolar(r1, (spokeAngle - a1) + spokeAngleOffset));
+            hole.appendVertex(RVector.createPolar(r0, (spokeAngle - a0) + spokeAngleOffset), innerSpokeBulge);
+            hole.appendVertex(RVector.createPolar(r0, a0 + spokeAngleOffset), 0);
+            hole.appendVertex(RVector.createPolar(r1, a1 + spokeAngleOffset), outerSpokeBulge);
+            hole.appendVertex(RVector.createPolar(r1, (spokeAngle - a1) + spokeAngleOffset), 0);
 
             // once all created add and draw
             addOperation.addObject(new RPolylineEntity(document, new RPolylineData(hole)));
