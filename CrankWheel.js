@@ -34,6 +34,8 @@
  * and restart QCAD it should now show up in your library browser.
  */
 
+// 0.0136;
+
 function CrankWheel() {
 }
 
@@ -77,10 +79,11 @@ CrankWheel.getLegendStr = function () {
     t += "Missing Teeth        : " + CrankWheel.missingTeeth + "\n";
     t += "Tooth Height         : " + CrankWheel.toothHeight + "\n";
     t += "Tooth Ratio          : " + CrankWheel.toothRatio + "\n";
-    t += "Center Hole Diameter : " + CrankWheel.toothHeight + "\n";
-    t += "Number of Spokes     : " + CrankWheel.numberOfSpokes + "\n";
+    t += "Center Hole Diameter : " + CrankWheel.centerHoleDiameter + "\n";
     t += "Number of Spokes     : " + CrankWheel.numberOfSpokes + "\n";
     t += "Spoke Ratio          : " + CrankWheel.spokeRatio + "\n";
+    t += "Inner Spoke Diameter : " + CrankWheel.spokeInnerDiameter + "\n";
+    t += "Outer Spoke Diameter : " + CrankWheel.spokeOuterDiameter + "\n";
     t += "Spoke Rotation       : " + CrankWheel.spokeRotation + "\n";
     t += "Bolt Hole Pattern 1" + "\n";
     t += "  Bolt Hole Count           : " + CrankWheel.boltHoleCount + "\n";
@@ -216,7 +219,6 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.boltPatternRotate2 = v.getValue();
 
-
     // QCheckBox
     CrankWheel.showLegend = CrankWheel.widgets["ShowLegend"].checked;
 
@@ -249,25 +251,24 @@ CrankWheel.generatePreview = function (di, iconSize) {
 // Translate a point around a center circle at a specific distance
 // Likely a built in function in QCAD but this works, could
 // validate if point is an array of 2 co-ordinates etc.
-function translatePoint(point, angle, unit) {
-    var x = point[0];
-    var y = point[1];
-    var rad = RMath.deg2rad(angle);	// RMath is from QCAD
+// function translatePoint(point, angle, unit) {
+//     var x = point[0];
+//     var y = point[1];
+//     var rad = RMath.deg2rad(angle);	// RMath is from QCAD
 
-    // By doing it this way instead of x = unit*Math.cos(rad);
-    // this allows positive direction upwards from zero
-    // This is translating a point around the origin
+//     // By doing it this way instead of x = unit*Math.cos(rad);
+//     // this allows positive direction upwards from zero
+//     // This is translating a point around the origin
 
-    x += unit * Math.sin(rad);
-    y += unit * Math.cos(rad);
+//     x += unit * Math.sin(rad);
+//     y += unit * Math.cos(rad);
 
-    return [x, y];	// the translated point
-}
+//     return [x, y];	// the translated point
+// }
 
 // create array of bolt holes formed in a circle about a point 0,0
 // Returns an array of RCircleEntity's or empty if nothing to do
 function generateBoltPattern(boltCount, angleOffset, circleDiameter, boltDiameter) {
-
     var boltPattern = [];
 
     // Reject some things if needed
@@ -275,10 +276,14 @@ function generateBoltPattern(boltCount, angleOffset, circleDiameter, boltDiamete
         return boltPattern;
     }
 
+    const circleSector = 2 * Math.PI / boltCount;
+    const offsetRads = RMath.deg2rad(angleOffset); // FUDGE_FACTOR is a HACK to rotate to 0 degrees. BUG???
+    const circleRadius = circleDiameter / 2.0;
+    const boltRadius = boltDiameter / 2.0;
+
+    // Now build the array of bolt holes
     for (var cnt = 0; cnt < boltCount; cnt++) {
-        var newPt = translatePoint([0, 0], angleOffset, circleDiameter / 2.0);
-        boltPattern.push(new RCircleData(new RVector(newPt), boltDiameter / 2.0));
-        angleOffset += 360.0 / boltCount;
+        boltPattern.push(new RCircleData(new RVector.createPolar(circleRadius, circleSector * cnt + offsetRads), boltRadius));
     }
 
     return boltPattern;

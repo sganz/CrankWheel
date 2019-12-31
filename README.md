@@ -30,11 +30,11 @@ You can modify the drawing as needed. You may want to select the parts of the wh
 
 You can't rotate the tooth pattern, but everything else can be. Make sure you can align your wheel based on the bolt hole locations. In many cases you can have multiple patterns at different angles or if you have a 3 bolt balancer you can set the hole count to 9 or 12 and have a lot of flexibility for positioning the wheel against your pickup.
 
-Tooth width will depend on your sensor (Hall or VR) look at the datasheet for it and look for tooth specifications.
+Tooth width will depend on your sensor (Hall or VR) look at the data sheet for it and look for tooth specifications.
 
 If you change some parameters to cause an error condition, generally the wheel will not be displayed as you drag the mouse into the drawing area. If you see this you may have an invalid setting.
 
-## Configurable Items
+## Wheel Parameters
 All default measurements are in inches, and degrees. If you are running
 QCAD in metric just change the values in the parameter dialog to be what you need. For
 bolt holes their are 2 sets, but are the same settings for either.

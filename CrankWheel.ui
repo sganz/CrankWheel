@@ -46,7 +46,7 @@
                             <item row="0" column="1">
                                 <widget class="RMathLineEdit" name="WheelDiameter">
                                     <property name="text">
-                                        <string>7.5</string>
+                                        <string>7</string>
                                     </property>
                                     <property name="angle">
                                         <bool>false</bool>
@@ -134,7 +134,7 @@
                             <item row="4" column="1">
                                 <widget class="RMathLineEdit" name="ToothRatio">
                                     <property name="text">
-                                        <string>0.25</string>
+                                        <string>0.3</string>
                                     </property>
                                     <property name="angle">
                                         <bool>false</bool>
@@ -233,7 +233,7 @@
                             <item row="10" column="1">
                                 <widget class="RMathLineEdit" name="SpokeInnerDiameter">
                                     <property name="text">
-                                        <string>4.5</string>
+                                        <string>4.25</string>
                                     </property>
                                     <property name="angle">
                                         <bool>false</bool>
@@ -255,7 +255,7 @@
                             <item row="11" column="1">
                                 <widget class="RMathLineEdit" name="SpokeOuterDiameter">
                                     <property name="text">
-                                        <string>6.0</string>
+                                        <string>5.5</string>
                                     </property>
                                     <property name="angle">
                                         <bool>false</bool>
@@ -338,7 +338,7 @@
                             <item row="16" column="1">
                                 <widget class="RMathLineEdit" name="BoltHoleDiameter">
                                     <property name="text">
-                                        <string>0.375</string>
+                                        <string>0.3860</string>
                                     </property>
                                     <property name="angle">
                                         <bool>false</bool>
@@ -415,7 +415,7 @@
                             <item row="20" column="1">
                                 <widget class="RMathLineEdit" name="BoltHoleDiameter2">
                                     <property name="text">
-                                        <string>0.375</string>
+                                        <string>0.3860</string>
                                     </property>
                                     <property name="angle">
                                         <bool>false</bool>
