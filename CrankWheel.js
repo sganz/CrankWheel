@@ -248,24 +248,6 @@ CrankWheel.generatePreview = function (di, iconSize) {
 
 // Helper Funcs
 
-// Translate a point around a center circle at a specific distance
-// Likely a built in function in QCAD but this works, could
-// validate if point is an array of 2 co-ordinates etc.
-// function translatePoint(point, angle, unit) {
-//     var x = point[0];
-//     var y = point[1];
-//     var rad = RMath.deg2rad(angle);	// RMath is from QCAD
-
-//     // By doing it this way instead of x = unit*Math.cos(rad);
-//     // this allows positive direction upwards from zero
-//     // This is translating a point around the origin
-
-//     x += unit * Math.sin(rad);
-//     y += unit * Math.cos(rad);
-
-//     return [x, y];	// the translated point
-// }
-
 // create array of bolt holes formed in a circle about a point 0,0
 // Returns an array of RCircleEntity's or empty if nothing to do
 function generateBoltPattern(boltCount, angleOffset, circleDiameter, boltDiameter) {
