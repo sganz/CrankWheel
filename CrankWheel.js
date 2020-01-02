@@ -34,8 +34,6 @@
  * and restart QCAD it should now show up in your library browser.
  */
 
-// 0.0136;
-
 function CrankWheel() {
 }
 
@@ -67,6 +65,9 @@ CrankWheel.showLegend = true;
 CrankWheel.showDebug = false;
 CrankWheel.drawRoundedRoots = true;
 
+CrankWheel.toothArea = 0;
+CrankWheel.toothWidth = 0;
+
 CrankWheel.prototype.toString = function () {
     print("CrankWheel.js:", "toString(): ");
 };
@@ -95,6 +96,8 @@ CrankWheel.getLegendStr = function () {
     t += "  Bolt Hole Circle Diameter : " + CrankWheel.boltHoleCircleDiameter2 + "\n";
     t += "  Bolt Hole Diameter        : " + CrankWheel.boltHoleDiameter2 + "\n";
     t += "  Bolt Pattern Rotate       : " + CrankWheel.boltPatternRotate2 + "\n";
+    t += "Tooth Area : " + CrankWheel.toothArea + "\n";
+    t += "Counter Weight Circle Radius : " + CrankWheel.counterWeightCircleRadius + "\n";
 
     return t;
 };
@@ -271,6 +274,48 @@ function generateBoltPattern(boltCount, angleOffset, circleDiameter, boltDiamete
     return boltPattern;
 }
 
+// Calculate the area of the simple tooth. This is basically an annular sector
+// and found some 'math' on the internets that does the trick
+// innerRadius is the innermost
+// outerRadius is the outermost
+// sectorAngle is the angle of the sector in DEGREES
+// A = ( R² - r² ) * π * Θ / 360 Area of a sector
+function simpleToothArea(innerRadius, outerRadius, sectorAngle) {
+    return (outerRadius * outerRadius - innerRadius * innerRadius) * Math.PI * sectorAngle / 360;
+}
+
+// Calculate the area of the fancy bottom curved tooth. This is the tooth
+// that is composed of a simple tooth with a radius on each
+// side of the tooth. The radius on the tooth is 1/4 of a circle
+// since the bulge is -1 which draws a semi-circle to the next point
+// Now to calculate all that... No idea. So my attack will be an
+// approximation. The way I did it was use the simpleToothArea
+// and add that with the 1/4 circle area on each side.
+// To get these little arcs ar the you can approximate this by drawing
+// a square with the diameter of 2 * Radius of the circle. Then
+// subtract the circle from the square and divide by 2 to get the area
+// of the base curves. This ONLY works because a Bulge of -1 is a semi-circle!
+function roundedRootToothArea(innerRadius, outerRadius, sectorAngle, rootRadius) {
+    const squareArea = rootRadius * rootRadius * 4; // area of a square
+    const circleArea = Math.PI * rootRadius * rootRadius;
+    const curveyRoots = (squareArea - circleArea) / 2; // area under both curvey parts
+
+    return simpleToothArea(innerRadius, outerRadius, sectorAngle) + curveyRoots;
+}
+
+// Given the area of a circle calculate the Radius that would
+// generate this area.
+// r = sqrt( A / π ) Radius of circle with given Area
+function circleAreaToRadius(circleArea) {
+    return Math.sqrt(circleArea / Math.PI);
+}
+
+// compute the equivalent area (missing) at a different radius. This
+// is a basic lever equation
+function balanceHoleAreaAtRadius(area, currentRadius, newRadius) {
+    return (area * currentRadius) / (newRadius);
+}
+
 // Does all the drawing work. Remember most things here just add points (vertices)
 // to an array for drawing. Drawing is closed so should alway be a closed surface for
 // the wheel.
@@ -364,6 +409,16 @@ CrankWheel.getOperation = function (di) {
     td.push([pitchCircleRadius, toothAngle, userBulge]);
     ltd.push([td[0][0], toothAngle, noMissingBulge]);
     mtd.push([td[0][0], toothAngle, insideBulge]);
+
+    // A = ( R² - r² ) * π * Θ / 360 Area of a sector
+    // r = sqrt( A / π ) Radius of circle with given Area
+    // Correction for distance
+    // NewArea = A * WheelPitchRadius / CounterWeightPositionRadius
+
+
+    CrankWheel.toothArea = simpleToothArea(pitchCircleRadius, wheelRadius, 3.0);
+    const leverArea = balanceHoleAreaAtRadius(CrankWheel.toothArea, pitchCircleRadius, 2.8);
+    CrankWheel.counterWeightCircleRadius = circleAreaToRadius(leverArea);
 
     // Construct the wheel here with teeth as previously created.
     //
@@ -489,6 +544,10 @@ CrankWheel.getOperation = function (di) {
         // tooth inner root circle
         var wheelPitchData = new RCircleData(center, pitchCircleRadius);
         addOperation.addObject(new RCircleEntity(document, wheelPitchData));
+
+        // User defined circle for the counter weight
+        //var wheelPitchData = new RCircleData(center, pitchCircleRadius);
+        //addOperation.addObject(new RCircleEntity(document, wheelPitchData));
 
         // if we are drawing bolt holes draw that circle
         if (CrankWheel.boltHoleCount) {
