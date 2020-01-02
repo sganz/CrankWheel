@@ -98,6 +98,7 @@ CrankWheel.getLegendStr = function () {
     t += "  Bolt Pattern Rotate       : " + CrankWheel.boltPatternRotate2 + "\n";
     t += "Tooth Area : " + CrankWheel.toothArea + "\n";
     t += "Counter Weight Circle Radius : " + CrankWheel.counterWeightCircleRadius + "\n";
+    t += "Tooth Width at Pitch : " + CrankWheel.toothPitchWidth + "\n";
 
     return t;
 };
@@ -316,6 +317,24 @@ function balanceHoleAreaAtRadius(area, currentRadius, newRadius) {
     return (area * currentRadius) / (newRadius);
 }
 
+// Need function to calculate the distance from 2 polar points
+// This can be used for tooth width and calculating bulge radius
+// The distance is √r²₁1+r²₂−2r₁r₂cos(θ1−θ2)
+// sqrt((r1 * r1 + r2 * r2) - 2 * r1 * r2 * cos(θ1−θ2) )
+//
+// pt1, pt2 are the point arrays with [radius, angle_radians, bulge]
+// bulge is not used.
+//
+// This is the CORD not an arc length
+function polarDistance(pt1, pt2) {
+    const r1 = pt1[0]; // radius
+    const a1 = pt1[1]; // angle
+    const r2 = pt2[0]; // radius
+    const a2 = pt2[1]; // angle
+
+    return Math.sqrt((r1 * r1 + r2 * r2) - 2 * r1 * r2 * Math.cos(a1 - a2));
+}
+
 // Does all the drawing work. Remember most things here just add points (vertices)
 // to an array for drawing. Drawing is closed so should alway be a closed surface for
 // the wheel.
@@ -407,18 +426,17 @@ CrankWheel.getOperation = function (di) {
     var noMissingBulge = CrankWheel.missingTeeth > 0 ? insideBulge : userBulge;
 
     td.push([pitchCircleRadius, toothAngle, userBulge]);
-    ltd.push([td[0][0], toothAngle, noMissingBulge]);
-    mtd.push([td[0][0], toothAngle, insideBulge]);
-
-    // A = ( R² - r² ) * π * Θ / 360 Area of a sector
-    // r = sqrt( A / π ) Radius of circle with given Area
-    // Correction for distance
-    // NewArea = A * WheelPitchRadius / CounterWeightPositionRadius
-
+    ltd.push([pitchCircleRadius, toothAngle, noMissingBulge]);
+    mtd.push([pitchCircleRadius, toothAngle, insideBulge]);
 
     CrankWheel.toothArea = simpleToothArea(pitchCircleRadius, wheelRadius, 3.0);
     const leverArea = balanceHoleAreaAtRadius(CrankWheel.toothArea, pitchCircleRadius, 2.8);
     CrankWheel.counterWeightCircleRadius = circleAreaToRadius(leverArea);
+
+    // measure td[1] to td[2] for top of wheel tooth distance
+    // measure td[0] to td[3] for bottom of wheel tooth distance
+
+    CrankWheel.toothPitchWidth = polarDistance(td[1], td[2]);
 
     // Construct the wheel here with teeth as previously created.
     //
@@ -459,6 +477,12 @@ CrankWheel.getOperation = function (di) {
             }
         }
     }
+
+    // measure from vertex to vertex, bulges not counted
+    // var pt1 = wheel.getVertexAt(3);
+    // var pt2 = wheel.getVertexAt(4);
+    // var dist = Math.sqrt((pt2[0] - pt1[0]) * (pt2[0] - pt1[0]) + (pt2[1] - pt1[1]) * (pt2[1] - pt1[1]));
+    // CrankWheel.counterWeightCircleRadius = dist;
 
     // Draw the wheel teeth
     addOperation.addObject(new RPolylineEntity(document, new RPolylineData(wheel)));
