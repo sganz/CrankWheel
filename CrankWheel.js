@@ -51,11 +51,11 @@ CrankWheel.centerHoleDiameter = 1.0;
 CrankWheel.boltHoleCount = 3;
 CrankWheel.boltHoleCircleDiameter = 2.5;
 CrankWheel.boltHoleDiameter = 0.375;
-CrankWheel.boltPatternRotate = 0;
+CrankWheel.boltPatternRotate = 0.0;
 CrankWheel.boltHoleCount2 = 0;
 CrankWheel.boltHoleCircleDiameter2 = 4.0;
 CrankWheel.boltHoleDiameter2 = 0.375;
-CrankWheel.boltPatternRotate2 = 60;
+CrankWheel.boltPatternRotate2 = 60.0;
 CrankWheel.numberOfSpokes = 0;
 CrankWheel.spokeRatio = 1.0;
 CrankWheel.spokeInnerDiameter = 4.0;
@@ -64,10 +64,14 @@ CrankWheel.spokeRotation = 0.0;
 CrankWheel.showLegend = true;
 CrankWheel.showDebug = false;
 CrankWheel.drawRoundedRoots = true;
+CrankWheel.toothArea = 0.0;
+CrankWheel.toothWidth = 0.0;
+CrankWheel.toothGapWidth = 0.0;
+CrankWheel.counterWeightDiameter = 0.0;
+CrankWheel.counterWeightPositionDiameter = 0.0;
+CrankWheel.centerAngle = 180.0;
 
-CrankWheel.toothArea = 0;
-CrankWheel.toothWidth = 0;
-
+// CrankWheel Class
 CrankWheel.prototype.toString = function () {
     print("CrankWheel.js:", "toString(): ");
 };
@@ -96,9 +100,13 @@ CrankWheel.getLegendStr = function () {
     t += "  Bolt Hole Circle Diameter : " + CrankWheel.boltHoleCircleDiameter2 + "\n";
     t += "  Bolt Hole Diameter        : " + CrankWheel.boltHoleDiameter2 + "\n";
     t += "  Bolt Pattern Rotate       : " + CrankWheel.boltPatternRotate2 + "\n";
-    t += "Tooth Area : " + CrankWheel.toothArea + "\n";
-    t += "Counter Weight Circle Radius : " + CrankWheel.counterWeightCircleRadius + "\n";
-    t += "Tooth Width at Pitch : " + CrankWheel.toothPitchWidth + "\n";
+    t += "Tooth Area :                : " + CrankWheel.toothArea + "\n";
+
+    t += "Weight Diameter             : " + CrankWheel.counterWeightDiameter + "\n";
+    t += "Weight Position Diameter    : " + CrankWheel.counterWeightPositionDiameter + "\n";
+    t += "Computed Tooth Width        : " + CrankWheel.toothWidth + "\n";
+    t += "Computed Gap Width          : " + CrankWheel.toothGapWidth + "\n";
+    t += "Center Angle                : " + CrankWheel.centerAngle + "\n";
 
     return t;
 };
@@ -223,6 +231,12 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.boltPatternRotate2 = v.getValue();
 
+    v = CrankWheel.widgets["CounterWeightPositionDiameter"];
+    if (!v.isValid()) {
+        return undefined;
+    }
+    CrankWheel.counterWeightPositionDiameter = v.getValue();
+
     // QCheckBox
     CrankWheel.showLegend = CrankWheel.widgets["ShowLegend"].checked;
 
@@ -280,9 +294,11 @@ function generateBoltPattern(boltCount, angleOffset, circleDiameter, boltDiamete
 // innerRadius is the innermost
 // outerRadius is the outermost
 // sectorAngle is the angle of the sector in DEGREES
-// A = ( R² - r² ) * π * Θ / 360 Area of a sector
+// A = ( R² - r² ) * π * angle / 360 Area of a sector Degs
+// A = ( R² - r² ) * π * angle / 2 * π Area of a sector Degs
+
 function simpleToothArea(innerRadius, outerRadius, sectorAngle) {
-    return (outerRadius * outerRadius - innerRadius * innerRadius) * Math.PI * sectorAngle / 360;
+    return (outerRadius * outerRadius - innerRadius * innerRadius) * Math.PI * sectorAngle / (2 * Math.PI);
 }
 
 // Calculate the area of the fancy bottom curved tooth. This is the tooth
@@ -401,6 +417,10 @@ CrankWheel.getOperation = function (di) {
     const outsideBulge = Math.tan(toothAngle / 4.0);
     const insideBulge = Math.tan(rootAngle / 4.0);
 
+    CrankWheel.centerAngle = RMath.rad2deg(Math.PI - (rootAngle + (rootAngle + toothAngle) * CrankWheel.missingTeeth) / 2);
+    // 1 - 7 3 7
+    // 2 - 7 3 7 3 7
+    // 3 - 7 3 7 3 7 3 7
     // Draws the tooth start points, same for both on the inner (pitchCircle)
     // and the outer. std - start tooth, td - middle teeth,
     // ltd - last tooth, mtd - outer missing tooth part
@@ -408,7 +428,9 @@ CrankWheel.getOperation = function (di) {
     // the pitch circle - the (chord length / 2) is the radius of the bulge since
     // the bulge is a semi-circle we can take advantage of this fact
 
-    const curvePitchRadius = pitchCircleRadius - chordLength(pitchCircleRadius, rootAngle) / 2.0;
+    CrankWheel.toothWidth = chordLength(wheelRadius, toothAngle);
+    CrankWheel.toothGapWidth = chordLength(pitchCircleRadius, rootAngle);
+    const curvePitchRadius = pitchCircleRadius - CrankWheel.toothGapWidth / 2.0;
     var curveOrFlatPitchRadius;
     var noMissingBulge;
 
@@ -460,18 +482,18 @@ CrankWheel.getOperation = function (di) {
     ltd.push([curveOrFlatPitchRadius, toothAngle, noMissingBulge]);
     mtd.push([curveOrFlatPitchRadius, toothAngle, insideBulge]);
 
-    CrankWheel.toothArea = simpleToothArea(pitchCircleRadius, wheelRadius, 3.0);
+    // need to pick based on tooth type and not do it if 0 missing teeth, need to calc a bit different
 
-    const leverArea = balanceHoleAreaAtRadius(CrankWheel.toothArea, pitchCircleRadius, 2.8);
-    CrankWheel.counterWeightCircleRadius = circleAreaToRadius(leverArea);
 
-    // remove this crap, set up a tooth width to display...
+    CrankWheel.toothArea = simpleToothArea(pitchCircleRadius, wheelRadius, toothAngle);
 
-    // measure td[1] to td[2] for top of wheel tooth distance
-    // measure td[0] to td[3] for bottom of wheel tooth distance
+    //else
+    //    CrankWheel.toothArea = roundedRootToothArea(pitchCircleRadius, wheelRadius, toothAngle);
 
-    CrankWheel.toothPitchWidth = polarDistance(td[1], td[2]);
-
+    if (CrankWheel.missingTeeth > 0) {
+        const leverArea = balanceHoleAreaAtRadius(CrankWheel.toothArea * CrankWheel.missingTeeth, pitchCircleRadius, CrankWheel.counterWeightPositionDiameter / 2.0);
+        CrankWheel.counterWeightDiameter = circleAreaToRadius(leverArea) * 2.0;
+    }
     // Construct the wheel here with teeth as previously created.
     //
     // Roll through the list of teeth and when at the point where we need missing
@@ -482,7 +504,6 @@ CrankWheel.getOperation = function (di) {
     wheel.setClosed(true);
 
     // Draw start tooth which may be different, similar to the last tooth
-
     for (var n = 0; n < td.length; n++) {
         wheel.appendVertex(RVector.createPolar(std[n][0], std[n][1]), std[n][2]);
     }
@@ -518,12 +539,6 @@ CrankWheel.getOperation = function (di) {
             }
         }
     }
-
-    // measure from vertex to vertex, bulges not counted
-    // var pt1 = wheel.getVertexAt(3);
-    // var pt2 = wheel.getVertexAt(4);
-    // var dist = Math.sqrt((pt2[0] - pt1[0]) * (pt2[0] - pt1[0]) + (pt2[1] - pt1[1]) * (pt2[1] - pt1[1]));
-    // CrankWheel.counterWeightCircleRadius = dist;
 
     // Draw the wheel teeth
     addOperation.addObject(new RPolylineEntity(document, new RPolylineData(wheel)));
