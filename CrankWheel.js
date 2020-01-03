@@ -417,10 +417,6 @@ CrankWheel.getOperation = function (di) {
     const outsideBulge = Math.tan(toothAngle / 4.0);
     const insideBulge = Math.tan(rootAngle / 4.0);
 
-    CrankWheel.centerAngle = RMath.rad2deg(Math.PI - (rootAngle + (rootAngle + toothAngle) * CrankWheel.missingTeeth) / 2);
-    // 1 - 7 3 7
-    // 2 - 7 3 7 3 7
-    // 3 - 7 3 7 3 7 3 7
     // Draws the tooth start points, same for both on the inner (pitchCircle)
     // and the outer. std - start tooth, td - middle teeth,
     // ltd - last tooth, mtd - outer missing tooth part
@@ -482,18 +478,38 @@ CrankWheel.getOperation = function (di) {
     ltd.push([curveOrFlatPitchRadius, toothAngle, noMissingBulge]);
     mtd.push([curveOrFlatPitchRadius, toothAngle, insideBulge]);
 
+    // compute the center of the missing tooth area 180 deg away
+    // so we can place the balance hole on the user specified radius
+    CrankWheel.centerAngle = RMath.rad2deg(Math.PI - (rootAngle + (rootAngle + toothAngle) * CrankWheel.missingTeeth) / 2);
+
     // need to pick based on tooth type and not do it if 0 missing teeth, need to calc a bit different
 
-
-    CrankWheel.toothArea = simpleToothArea(pitchCircleRadius, wheelRadius, toothAngle);
-
-    //else
-    //    CrankWheel.toothArea = roundedRootToothArea(pitchCircleRadius, wheelRadius, toothAngle);
+    if (CrankWheel.drawRoundedRoots) {
+        // for rounded roots we need to know the radius of the curve
+        CrankWheel.toothArea = roundedRootToothArea(pitchCircleRadius, wheelRadius, toothAngle, CrankWheel.toothGapWidth / 2.0);
+    }
+    else {
+        CrankWheel.toothArea = simpleToothArea(pitchCircleRadius, wheelRadius, toothAngle);
+    }
 
     if (CrankWheel.missingTeeth > 0) {
         const leverArea = balanceHoleAreaAtRadius(CrankWheel.toothArea * CrankWheel.missingTeeth, pitchCircleRadius, CrankWheel.counterWeightPositionDiameter / 2.0);
         CrankWheel.counterWeightDiameter = circleAreaToRadius(leverArea) * 2.0;
+
+        // draw the balance hole, use the pattern generator to rotate a single hole around
+        if (CrankWheel.counterWeightDiameter > 0.0) {
+            generateBoltPattern(
+                1,
+                CrankWheel.centerAngle,
+                CrankWheel.counterWeightPositionDiameter,
+                CrankWheel.counterWeightDiameter).forEach(
+                    function (hole) {
+                        addOperation.addObject(new RCircleEntity(document, hole));
+                    }
+                );
+        }
     }
+
     // Construct the wheel here with teeth as previously created.
     //
     // Roll through the list of teeth and when at the point where we need missing
