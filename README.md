@@ -37,7 +37,7 @@ If you change some parameters to cause an error condition, generally the wheel w
 ## Wheel Parameters
 All default measurements are in inches, and degrees. If you are running
 QCAD in metric just change the values in the parameter dialog to be what you need. For
-bolt holes their are 2 sets, but are the same settings for either.
+bolt holes their are 2 sets, but are the same settings for either. Most all dimensions are in reference to a diameter. Generally parameters set to 0 will disable it's functionality.
 
 - Wheel Diameter - Specifies the OUTER diameter of the wheel
 - Center Hole Diameter - Center hole of the wheel, set to 0 if no hole desired
@@ -55,13 +55,15 @@ bolt holes their are 2 sets, but are the same settings for either.
 - Spoke Inner Diameter - Sets the inner diameter of the spoke holes, should be less then the Outer Diameter
 - Spoke Outer Diameter - Sets the outer diameter of the spoke holes
 - Spoke Rotation - Rotates the spoke pattern some degrees, default is 0
+- Counter Weight Position Diameter - The position of the counter weight hole. This will be computed based on number of teeth. This will be positioned across from the center line of the missing teeth. 0 removes it as well as not drawn for wheels without missing teeth (Think about it)
 - Show Legend - Shows a text legend on the drawing with all the parameters (can cause drawing to slow on some machines)
 - Debug - Draws any debug lines, typically circles to show layout
 
 ## Todo
 - Add Round operation on spoke holes, easily done manually, but would be nice to do in the script
+- Add Round operatino on missing tooth wheels for the missing tooth section
 - Better error handling with warning
-- Tool tips
+- Tool tips and Status Tips.
 
 Some of the above can be easily done in QCAD with a small amount of manual work.
 

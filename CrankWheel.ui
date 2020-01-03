@@ -142,7 +142,7 @@
                                     <property name="defaultValue" stdset="0">
                                         <double>0.000000000000000</double>
                                     </property>
-                                    <property name="toolTip">
+                                    <property name="statusTip">
                                         <string>Tooth to space ratio, 0.5 give an even tooth to space ratio. Width of tooth depends on wheel diameter</string>
                                     </property>
                                 </widget>
@@ -448,6 +448,35 @@
                                     </property>
                                 </widget>
                             </item>
+
+                            <item row="23" column="0">
+                                <widget class="QLabel" name="lblCounterWeightPositionDiameter">
+                                    <property name="text">
+                                        <string>Counter Weight Diameter</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item row="23" column="1">
+                                <widget class="RMathLineEdit" name="CounterWeightPositionDiameter">
+                                    <property name="text">
+                                        <string>0.0</string>
+                                    </property>
+                                    <property name="angle">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="defaultValue" stdset="0">
+                                        <double>0.000000000000000</double>
+                                    </property>
+                                    <property name="toolTip">
+                                        <string>Create a counter weight hole at this Diameter position. Size will be computed from this diameter.</string>
+                                    </property>
+                                    <property name="statusTip">
+                                        <string>Create a counter weight hole at this Diameter position. Size will be computed from this diameter.</string>
+                                    </property>
+                                </widget>
+                            </item>
+
+
                             <item row="7" column="0" colspan="2">
                                 <widget class="Line" name="line">
                                     <property name="sizePolicy">
@@ -523,7 +552,25 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="23" column="0">
+
+                            <item row="25" column="0" colspan="2">
+                                <widget class="Line" name="line_4">
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>100</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="lineWidth">
+                                        <number>2</number>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                </widget>
+                            </item>
+
+                            <item row="26" column="0">
                                 <widget class="QCheckBox" name="ShowLegend">
                                     <property name="text">
                                         <string>Draw Text Legend</string>
@@ -536,7 +583,7 @@
                                     </property>
                                 </widget>
                             </item>
-                            <item row="23" column="1">
+                            <item row="26" column="1">
                                 <widget class="QCheckBox" name="ShowDebug">
                                     <property name="text">
                                         <string>Draw Debug</string>
