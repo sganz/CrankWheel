@@ -450,14 +450,14 @@
                             </item>
 
                             <item row="23" column="0">
-                                <widget class="QLabel" name="lblCounterWeightPositionDiameter">
+                                <widget class="QLabel" name="lblBalanceHolePositionDiameter">
                                     <property name="text">
-                                        <string>Counter Weight Diameter</string>
+                                        <string>Balance Hole Position Diameter</string>
                                     </property>
                                 </widget>
                             </item>
                             <item row="23" column="1">
-                                <widget class="RMathLineEdit" name="CounterWeightPositionDiameter">
+                                <widget class="RMathLineEdit" name="BalanceHolePositionDiameter">
                                     <property name="text">
                                         <string>0.0</string>
                                     </property>
@@ -468,10 +468,10 @@
                                         <double>0.000000000000000</double>
                                     </property>
                                     <property name="toolTip">
-                                        <string>Create a counter weight hole at this Diameter position. Size will be computed from this diameter.</string>
+                                        <string>Create a balance hole at this Diameter position. Size will be computed from this diameter.</string>
                                     </property>
                                     <property name="statusTip">
-                                        <string>Create a counter weight hole at this Diameter position. Size will be computed from this diameter.</string>
+                                        <string>Create a balance hole hole at this Diameter position. Size will be computed from this diameter.</string>
                                     </property>
                                 </widget>
                             </item>
