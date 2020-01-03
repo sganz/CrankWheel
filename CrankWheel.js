@@ -67,8 +67,8 @@ CrankWheel.drawRoundedRoots = true;
 CrankWheel.toothArea = 0.0;
 CrankWheel.toothWidth = 0.0;
 CrankWheel.toothGapWidth = 0.0;
-CrankWheel.counterWeightDiameter = 0.0;
-CrankWheel.counterWeightPositionDiameter = 0.0;
+CrankWheel.balanceHoleDiameter = 0.0;
+CrankWheel.balanceHolePositionDiameter = 0.0;
 CrankWheel.centerAngle = 180.0;
 
 // CrankWheel Class
@@ -102,8 +102,8 @@ CrankWheel.getLegendStr = function () {
     t += "  Bolt Pattern Rotate       : " + CrankWheel.boltPatternRotate2 + "\n";
     t += "Tooth Area :                : " + CrankWheel.toothArea + "\n";
 
-    t += "Weight Diameter             : " + CrankWheel.counterWeightDiameter + "\n";
-    t += "Weight Position Diameter    : " + CrankWheel.counterWeightPositionDiameter + "\n";
+    t += "Balance Hole Diameter       : " + CrankWheel.balanceHoleDiameter + "\n";
+    t += "Balance Position Diameter   : " + CrankWheel.balanceHolePositionDiameter + "\n";
     t += "Computed Tooth Width        : " + CrankWheel.toothWidth + "\n";
     t += "Computed Gap Width          : " + CrankWheel.toothGapWidth + "\n";
     t += "Center Angle                : " + CrankWheel.centerAngle + "\n";
@@ -231,11 +231,11 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.boltPatternRotate2 = v.getValue();
 
-    v = CrankWheel.widgets["CounterWeightPositionDiameter"];
+    v = CrankWheel.widgets["BalanceHolePositionDiameter"];
     if (!v.isValid()) {
         return undefined;
     }
-    CrankWheel.counterWeightPositionDiameter = v.getValue();
+    CrankWheel.balanceHolePositionDiameter = v.getValue();
 
     // QCheckBox
     CrankWheel.showLegend = CrankWheel.widgets["ShowLegend"].checked;
@@ -243,9 +243,8 @@ CrankWheel.generate = function (di, file) {
     // QCheckBox
     CrankWheel.showDebug = CrankWheel.widgets["ShowDebug"].checked;
 
-    // At this point generate the wheel. Prior to this
-    // some validation could be done to prevent invalid
-    // wheels due to params.
+    // At this point generate the wheel. Prior to this some validation
+    // could be done to prevent invalid wheels due to params.
 
     return CrankWheel.getOperation(di);
 };
@@ -347,7 +346,7 @@ function chordLength(radius, angle) {
 // pt1, pt2 are the point arrays with [radius, angle_radians, bulge]
 // bulge is not used.
 //
-// This is the length not an arc length
+// This is the length (chord) not an arc length
 function polarDistance(pt1, pt2) {
     const r1 = pt1[0]; // radius
     const a1 = pt1[1]; // angle
@@ -418,8 +417,12 @@ CrankWheel.getOperation = function (di) {
     const insideBulge = Math.tan(rootAngle / 4.0);
 
     // Draws the tooth start points, same for both on the inner (pitchCircle)
-    // and the outer. std - start tooth, td - middle teeth,
-    // ltd - last tooth, mtd - outer missing tooth part
+    // and the outer.
+    // Tooth Legend :
+    //  std - start tooth
+    //  td  - middle teeth
+    //  ltd - last tooth
+    //  mtd - outer missing tooth part
 
     // the pitch circle - the (chord length / 2) is the radius of the bulge since
     // the bulge is a semi-circle we can take advantage of this fact
@@ -462,17 +465,8 @@ CrankWheel.getOperation = function (di) {
     td.push([wheelRadius, toothAngle, 0]); // draw end point of outer tooth, next line is a line down to pitchCircle
     ltd.push([wheelRadius, toothAngle, 0]);
 
-    // This is the bottom gulley (root) of each tooth. Will be the
-    // same for regular tooth or missing tooth
-
-    // Bulge notes
-    // Setting the rootBulge in td to -1 will do the perfect semi-circle on the
-    // bottom of the tooth. However the last tooth then has a semi-circle to the
-    // mtd lower radius arc which is odd. So for the last td tooth, it needs to be
-    // swapped with a pattern of regular tooth, regular radius bulge so
-    // it can align to the missing tooth root. If no missing tooth, nothing needs
-    // to be done as all the bulges at -1  will be fine.
-
+    // Set the bulge type based on style of tooth and where it is,
+    // First, Middle, Missing, and Last
     std.push([pitchCircleRadius, toothAngle, userBulge]);
     td.push([pitchCircleRadius, toothAngle, userBulge]);
     ltd.push([curveOrFlatPitchRadius, toothAngle, noMissingBulge]);
@@ -485,24 +479,25 @@ CrankWheel.getOperation = function (di) {
     // need to pick based on tooth type and not do it if 0 missing teeth, need to calc a bit different
 
     if (CrankWheel.drawRoundedRoots) {
-        // for rounded roots we need to know the radius of the curve
+        // for rounded roots we need to know the radius of the root curve. We have that!
         CrankWheel.toothArea = roundedRootToothArea(pitchCircleRadius, wheelRadius, toothAngle, CrankWheel.toothGapWidth / 2.0);
     }
     else {
         CrankWheel.toothArea = simpleToothArea(pitchCircleRadius, wheelRadius, toothAngle);
     }
 
-    if (CrankWheel.missingTeeth > 0) {
-        const leverArea = balanceHoleAreaAtRadius(CrankWheel.toothArea * CrankWheel.missingTeeth, pitchCircleRadius, CrankWheel.counterWeightPositionDiameter / 2.0);
-        CrankWheel.counterWeightDiameter = circleAreaToRadius(leverArea) * 2.0;
+    // If we do have any missing teeth and want a balance hole do it now
+    if (CrankWheel.missingTeeth > 0 && CrankWheel.balanceHolePositionDiameter > 0.0) {
+        const leverArea = balanceHoleAreaAtRadius(CrankWheel.toothArea * CrankWheel.missingTeeth, pitchCircleRadius, CrankWheel.balanceHolePositionDiameter / 2.0);
+        CrankWheel.balanceHoleDiameter = circleAreaToRadius(leverArea) * 2.0;
 
         // draw the balance hole, use the pattern generator to rotate a single hole around
-        if (CrankWheel.counterWeightDiameter > 0.0) {
+        if (CrankWheel.balanceHoleDiameter > 0.0) {
             generateBoltPattern(
                 1,
                 CrankWheel.centerAngle,
-                CrankWheel.counterWeightPositionDiameter,
-                CrankWheel.counterWeightDiameter).forEach(
+                CrankWheel.balanceHolePositionDiameter,
+                CrankWheel.balanceHoleDiameter).forEach(
                     function (hole) {
                         addOperation.addObject(new RCircleEntity(document, hole));
                     }
