@@ -34,8 +34,6 @@
  * and restart QCAD it should now show up in your library browser.
  */
 
-// 0.0136;
-
 function CrankWheel() {
 }
 
@@ -53,11 +51,11 @@ CrankWheel.centerHoleDiameter = 1.0;
 CrankWheel.boltHoleCount = 3;
 CrankWheel.boltHoleCircleDiameter = 2.5;
 CrankWheel.boltHoleDiameter = 0.375;
-CrankWheel.boltPatternRotate = 0;
+CrankWheel.boltPatternRotate = 0.0;
 CrankWheel.boltHoleCount2 = 0;
 CrankWheel.boltHoleCircleDiameter2 = 4.0;
 CrankWheel.boltHoleDiameter2 = 0.375;
-CrankWheel.boltPatternRotate2 = 60;
+CrankWheel.boltPatternRotate2 = 60.0;
 CrankWheel.numberOfSpokes = 0;
 CrankWheel.spokeRatio = 1.0;
 CrankWheel.spokeInnerDiameter = 4.0;
@@ -66,7 +64,14 @@ CrankWheel.spokeRotation = 0.0;
 CrankWheel.showLegend = true;
 CrankWheel.showDebug = false;
 CrankWheel.drawRoundedRoots = true;
+CrankWheel.toothArea = 0.0;
+CrankWheel.toothWidth = 0.0;
+CrankWheel.toothGapWidth = 0.0;
+CrankWheel.balanceHoleDiameter = 0.0;
+CrankWheel.balanceHolePositionDiameter = 0.0;
+CrankWheel.centerAngle = 180.0;
 
+// CrankWheel Class
 CrankWheel.prototype.toString = function () {
     print("CrankWheel.js:", "toString(): ");
 };
@@ -95,6 +100,13 @@ CrankWheel.getLegendStr = function () {
     t += "  Bolt Hole Circle Diameter : " + CrankWheel.boltHoleCircleDiameter2 + "\n";
     t += "  Bolt Hole Diameter        : " + CrankWheel.boltHoleDiameter2 + "\n";
     t += "  Bolt Pattern Rotate       : " + CrankWheel.boltPatternRotate2 + "\n";
+    t += "Tooth Area :                : " + CrankWheel.toothArea + "\n";
+
+    t += "Balance Hole Diameter       : " + CrankWheel.balanceHoleDiameter + "\n";
+    t += "Balance Position Diameter   : " + CrankWheel.balanceHolePositionDiameter + "\n";
+    t += "Computed Tooth Width        : " + CrankWheel.toothWidth + "\n";
+    t += "Computed Gap Width          : " + CrankWheel.toothGapWidth + "\n";
+    t += "Center Angle                : " + CrankWheel.centerAngle + "\n";
 
     return t;
 };
@@ -219,15 +231,20 @@ CrankWheel.generate = function (di, file) {
     }
     CrankWheel.boltPatternRotate2 = v.getValue();
 
+    v = CrankWheel.widgets["BalanceHolePositionDiameter"];
+    if (!v.isValid()) {
+        return undefined;
+    }
+    CrankWheel.balanceHolePositionDiameter = v.getValue();
+
     // QCheckBox
     CrankWheel.showLegend = CrankWheel.widgets["ShowLegend"].checked;
 
     // QCheckBox
     CrankWheel.showDebug = CrankWheel.widgets["ShowDebug"].checked;
 
-    // At this point generate the wheel. Prior to this
-    // some validation could be done to prevent invalid
-    // wheels due to params.
+    // At this point generate the wheel. Prior to this some validation
+    // could be done to prevent invalid wheels due to params.
 
     return CrankWheel.getOperation(di);
 };
@@ -269,6 +286,59 @@ function generateBoltPattern(boltCount, angleOffset, circleDiameter, boltDiamete
     }
 
     return boltPattern;
+}
+
+// Calculate the area of the simple tooth. This is basically an annular sector
+// and found some 'math' on the internets that does the trick
+// innerRadius is the innermost
+// outerRadius is the outermost
+// sectorAngle is the angle of the sector in DEGREES
+// A = ( R² - r² ) * π * angle / 360 Area of a sector Degs
+// A = ( R² - r² ) * π * angle / 2 * π Area of a sector Degs
+
+function simpleToothArea(innerRadius, outerRadius, sectorAngle) {
+    return (outerRadius * outerRadius - innerRadius * innerRadius) * Math.PI * sectorAngle / (2 * Math.PI);
+}
+
+// Calculate the area of the fancy bottom curved tooth. This is the tooth
+// that is composed of a simple tooth with a radius on each
+// side of the tooth. The radius on the tooth is 1/4 of a circle
+// since the bulge is -1 which draws a semi-circle to the next point
+// Now to calculate all that... No idea. So my attack will be an
+// approximation. The way I did it was use the simpleToothArea
+// and add that with the 1/4 circle area on each side.
+// To get these little arcs ar the you can approximate this by drawing
+// a square with the diameter of 2 * Radius of the circle. Then
+// subtract the circle from the square and divide by 2 to get the area
+// of the base curves. This ONLY works because a Bulge of -1 is a semi-circle!
+function roundedRootToothArea(innerRadius, outerRadius, sectorAngle, rootRadius) {
+    const squareArea = rootRadius * rootRadius * 4;
+    const circleArea = Math.PI * rootRadius * rootRadius;
+    const curveyRoots = (squareArea - circleArea) / 2; // area under both curvey parts
+
+    // now add the curvy part with the regular tooth part. Gets a close
+    // approximation, not exact but good enough. Draw the picture to see why
+    // and remember the tooth is an annular (arcs top and bottom)
+    return simpleToothArea(innerRadius, outerRadius, sectorAngle) + curveyRoots;
+}
+
+// Given the area of a circle calculate the Radius that would
+// generate this area.
+// r = sqrt( A / π ) Radius of circle with given Area
+function circleAreaToRadius(circleArea) {
+    return Math.sqrt(circleArea / Math.PI);
+}
+
+// compute the equivalent area (missing) at a different radius. This
+// is a basic lever equation at play
+function balanceHoleAreaAtRadius(area, currentRadius, newRadius) {
+    return (area * currentRadius) / (newRadius);
+}
+
+// calculates the chord length given the radius and angle
+// angle in radians of course
+function chordLength(radius, angle) {
+    return 2.0 * radius * Math.sin(angle / 2.0);
 }
 
 // Does all the drawing work. Remember most things here just add points (vertices)
@@ -319,51 +389,106 @@ CrankWheel.getOperation = function (di) {
     var td = [];    // tooth data user selected bulge
     var mtd = [];   // missing tooth data all nice lower arc
     var ltd = [];   // last tooth IF bulge root is selected needs to be different
-
-    // Draws the tooth start points, same for both on the inner (pitchCircle)
-    // and the outer. td - teeth, ltd - last tooth, mtd - outer missing parts
-    td.push([pitchCircleRadius, 0, 0]);
-    ltd.push([pitchCircleRadius, 0, 0]);
-    mtd.push([pitchCircleRadius, 0, 0]);
+    var std = [];
 
     // This draws the top of the tooth's arch and the inner missing
     // arch which is later used IF missing teeth are specified
+
     const sectorAngle = 2.0 * Math.PI / CrankWheel.numberOfTeeth;
     const percentTooth = CrankWheel.toothRatio;
     const toothAngle = sectorAngle * percentTooth;
     const rootAngle = sectorAngle - toothAngle;
-
-    // These are the bulge factors needed for line drawing for tooth (outer) and root (inner)
-    // To compute the bulge for a specified angle it's - tan(angle/4)
     const outsideBulge = Math.tan(toothAngle / 4.0);
     const insideBulge = Math.tan(rootAngle / 4.0);
 
+    // Draws the tooth start points, same for both on the inner (pitchCircle)
+    // and the outer.
+    // Tooth Legend :
+    //  std - start tooth
+    //  td  - middle teeth
+    //  ltd - last tooth
+    //  mtd - outer missing tooth part
+
+    // the pitch circle - the (chord length / 2) is the radius of the bulge since
+    // the bulge is a semi-circle we can take advantage of this fact
+
+    CrankWheel.toothWidth = chordLength(wheelRadius, toothAngle);
+    CrankWheel.toothGapWidth = chordLength(pitchCircleRadius, rootAngle);
+    const curvePitchRadius = pitchCircleRadius - CrankWheel.toothGapWidth / 2.0;
+    var curveOrFlatPitchRadius;
+    var noMissingBulge;
+
+    // screwy logic to set up drawing curved teeth, curved teeth with missing,
+    // non curved teeth and non curved with missing. a bulge of -1 is a semi-circle for
+    // the fancy looking teeth. I'm sure their is a cleaner way to do this...
+
+    const userBulge = CrankWheel.drawRoundedRoots ? -1.0 : insideBulge;
+
+    if (CrankWheel.missingTeeth > 0) {
+        curveOrFlatPitchRadius = CrankWheel.drawRoundedRoots ? curvePitchRadius : pitchCircleRadius;
+        noMissingBulge = insideBulge;
+    }
+    else {
+        curveOrFlatPitchRadius = pitchCircleRadius;
+        noMissingBulge = userBulge;
+    }
+
+    // Point 1, start of tooth, bottom
+    std.push([curveOrFlatPitchRadius, 0, 0]);
+    td.push([pitchCircleRadius, 0, 0]);
+    ltd.push([pitchCircleRadius, 0, 0]);
+    mtd.push([curveOrFlatPitchRadius, 0, 0]);
+
     // draw point 2, which is the inner to outer line, continue draw with bulge
+    std.push([wheelRadius, 0, outsideBulge]);
     td.push([wheelRadius, 0, outsideBulge]);
     ltd.push([wheelRadius, 0, outsideBulge]);
-    mtd.push([pitchCircleRadius, 0, outsideBulge]);  // save the pattern for the bottom (root) not a top
+    mtd.push([curveOrFlatPitchRadius, 0, outsideBulge]);  // save the pattern for the bottom (root) not a top
 
     // draw point 3, which is the arch
+    std.push([wheelRadius, toothAngle, 0]);
     td.push([wheelRadius, toothAngle, 0]); // draw end point of outer tooth, next line is a line down to pitchCircle
     ltd.push([wheelRadius, toothAngle, 0]);
 
-    // This is the bottom gulley (root) of each tooth. Will be the
-    // same for regular tooth or missing tooth
-
-    // Bulge notes
-    // Setting the rootBulge in td to -1 will do the perfect semi-circle on the
-    // bottom of the tooth. However the last tooth then has a semi-circle to the
-    // mtd lower radius arc which is odd. So for the last td tooth, it needs to be
-    // swapped with a pattern of regular tooth, regular radius bulge so
-    // it can align to the missing tooth root. If no missing tooth, nothing needs
-    // to be done as all the bulges at -1  will be fine.
-
-    var userBulge = CrankWheel.drawRoundedRoots ? -1.0 : insideBulge;
-    var noMissingBulge = CrankWheel.missingTeeth > 0 ? insideBulge : userBulge;
-
+    // Set the bulge type based on style of tooth and where it is,
+    // First, Middle, Missing, and Last
+    std.push([pitchCircleRadius, toothAngle, userBulge]);
     td.push([pitchCircleRadius, toothAngle, userBulge]);
-    ltd.push([td[0][0], toothAngle, noMissingBulge]);
-    mtd.push([td[0][0], toothAngle, insideBulge]);
+    ltd.push([curveOrFlatPitchRadius, toothAngle, noMissingBulge]);
+    mtd.push([curveOrFlatPitchRadius, toothAngle, insideBulge]);
+
+    // compute the center of the missing tooth area 180 deg away
+    // so we can place the balance hole on the user specified radius
+    CrankWheel.centerAngle = RMath.rad2deg(Math.PI - (rootAngle + (rootAngle + toothAngle) * CrankWheel.missingTeeth) / 2);
+
+    // need to pick based on tooth type and not do it if 0 missing teeth, need to calc a bit different
+
+    if (CrankWheel.drawRoundedRoots) {
+        // for rounded roots we need to know the radius of the root curve. We have that!
+        CrankWheel.toothArea = roundedRootToothArea(pitchCircleRadius, wheelRadius, toothAngle, CrankWheel.toothGapWidth / 2.0);
+    }
+    else {
+        CrankWheel.toothArea = simpleToothArea(pitchCircleRadius, wheelRadius, toothAngle);
+    }
+
+    // If we do have any missing teeth and want a balance hole do it now
+    if (CrankWheel.missingTeeth > 0 && CrankWheel.balanceHolePositionDiameter > 0.0) {
+        const leverArea = balanceHoleAreaAtRadius(CrankWheel.toothArea * CrankWheel.missingTeeth, pitchCircleRadius, CrankWheel.balanceHolePositionDiameter / 2.0);
+        CrankWheel.balanceHoleDiameter = circleAreaToRadius(leverArea) * 2.0;
+
+        // draw the balance hole, use the pattern generator to rotate a single hole around
+        if (CrankWheel.balanceHoleDiameter > 0.0) {
+            generateBoltPattern(
+                1,
+                CrankWheel.centerAngle,
+                CrankWheel.balanceHolePositionDiameter,
+                CrankWheel.balanceHoleDiameter).forEach(
+                    function (hole) {
+                        addOperation.addObject(new RCircleEntity(document, hole));
+                    }
+                );
+        }
+    }
 
     // Construct the wheel here with teeth as previously created.
     //
@@ -373,7 +498,13 @@ CrankWheel.getOperation = function (di) {
 
     wheel = new RPolyline();
     wheel.setClosed(true);
-    for (var i = 0; i < CrankWheel.numberOfTeeth; i++) {
+
+    // Draw start tooth which may be different, similar to the last tooth
+    for (var n = 0; n < td.length; n++) {
+        wheel.appendVertex(RVector.createPolar(std[n][0], std[n][1]), std[n][2]);
+    }
+
+    for (var i = 1; i < CrankWheel.numberOfTeeth; i++) {
 
         // logic here might be if a missing tooth cnt > 0 always the last tooth is drawn with
         // a regular arc (bulge), then the mtd will always connect. Might go with td, mtd, ltd (last tooth)
@@ -489,6 +620,10 @@ CrankWheel.getOperation = function (di) {
         // tooth inner root circle
         var wheelPitchData = new RCircleData(center, pitchCircleRadius);
         addOperation.addObject(new RCircleEntity(document, wheelPitchData));
+
+        // User defined circle for the counter weight
+        //var wheelPitchData = new RCircleData(center, pitchCircleRadius);
+        //addOperation.addObject(new RCircleEntity(document, wheelPitchData));
 
         // if we are drawing bolt holes draw that circle
         if (CrankWheel.boltHoleCount) {

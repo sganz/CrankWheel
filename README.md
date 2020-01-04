@@ -26,18 +26,22 @@ If you enter invalid values you may get to see some odd drawings. Check your dat
 *Note : To be clear once the wheel is drawn, you can't change parameters, so if you don't like what you just created, delete it and start over.*
 
 ### Tips
-You can modify the drawing as needed. You may want to select the parts of the wheel you might be working on first and use the Explode Block command (XP). This will allow you to work in any individual segment or part of the wheel.
+- You can modify the drawing as needed. You may want to select the parts of the wheel you might be working on first and use the Explode Block command (XP). This will allow you to work in any individual segment or part of the wheel.
 
-You can't rotate the tooth pattern, but everything else can be. Make sure you can align your wheel based on the bolt hole locations. In many cases you can have multiple patterns at different angles or if you have a 3 bolt balancer you can set the hole count to 9 or 12 and have a lot of flexibility for positioning the wheel against your pickup.
+- Another good command is the Round (RN) command. This can be used with a small radius on edges like the spokes or missing teeth end points to give a pleasing look.
 
-Tooth width will depend on your sensor (Hall or VR) look at the data sheet for it and look for tooth specifications.
+- If you like old school ROUND looking spokes. Set the spoke count to 0 and use the second set up bolts holes for that purpose.
 
-If you change some parameters to cause an error condition, generally the wheel will not be displayed as you drag the mouse into the drawing area. If you see this you may have an invalid setting.
+- You can't rotate the tooth pattern, but everything else can be. Make sure you can align your wheel based on the bolt hole locations. In many cases you can have multiple patterns at different angles or if you have a 3 bolt balancer you can set the hole count to 9 or 12 and have a lot of flexibility for positioning the wheel against your pickup.
+
+- The balancing hole will be generated automatically based on the diameter you set. It is not smart enough to know that it may overlap with a spoke hole. So you may have to play around a bit with spoke rotation, and thickness to get things just right.
+
+- Tooth width will depend on your sensor (Hall or VR) look at the data sheet for it and look for tooth specifications.
+
+- If you change some parameters to cause an error condition, generally the wheel will not be displayed as you drag the mouse into the drawing area. If you see this you may have an invalid setting.
 
 ## Wheel Parameters
-All default measurements are in inches, and degrees. If you are running
-QCAD in metric just change the values in the parameter dialog to be what you need. For
-bolt holes their are 2 sets, but are the same settings for either.
+All default measurements are in inches, and degrees. If you are running QCAD in metric just change the values in the parameter dialog to be what you need. For bolt holes their are 2 sets, but are the same settings for either. Most all dimensions are in reference to a diameter. Generally parameters set to 0 will disable it's functionality.
 
 - Wheel Diameter - Specifies the OUTER diameter of the wheel
 - Center Hole Diameter - Center hole of the wheel, set to 0 if no hole desired
@@ -55,15 +59,17 @@ bolt holes their are 2 sets, but are the same settings for either.
 - Spoke Inner Diameter - Sets the inner diameter of the spoke holes, should be less then the Outer Diameter
 - Spoke Outer Diameter - Sets the outer diameter of the spoke holes
 - Spoke Rotation - Rotates the spoke pattern some degrees, default is 0
+- Balance Hole Position Diameter - The position of the balance weight hole. This will be computed based on number of teeth. This will be positioned across from the center line of the missing teeth. Setting to 0 removes it. It is not drawn for wheels without missing teeth (Think about it). Moving this to a different position will make it useless (think about it too)
 - Show Legend - Shows a text legend on the drawing with all the parameters (can cause drawing to slow on some machines)
 - Debug - Draws any debug lines, typically circles to show layout
 
 ## Todo
 - Add Round operation on spoke holes, easily done manually, but would be nice to do in the script
+- Add Round operation on missing tooth wheels for the missing tooth ending section
 - Better error handling with warning
-- Tool tips
+- Tool tips and Status Tips.
 
-Some of the above can be easily done in QCAD with a small amount of manual work.
+Some of the above can be easily done in QCAD with a small amount of manual work (see TIPS above).
 
 Make fork, make changes and open a Pull Request and I'll integrate any changes.
 
@@ -72,4 +78,7 @@ Special thanks to Iain Hibbert for his work on the Gear generator for QCAD where
 work was started from.
 
 ## License, Warranty
-MIT Code is COPYRIGHT (C) 2019-2020 Sandy Ganz, NOT WARRANTY IS IMPLIED, USE AT YOUR OWN RISK
+MIT Code is COPYRIGHT (C) 2019-2020 Sandy Ganz, NO WARRANTY IS IMPLIED, USE AT YOUR OWN RISK
+
+If you make some wheels share the CAD for your particular engine, I can host the designs or the parameters
+giving back to the system so others can gain some knowledge from your trials is a nice thing, especially after you got this great free software!
