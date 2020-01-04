@@ -338,7 +338,7 @@
                             <item row="16" column="1">
                                 <widget class="RMathLineEdit" name="BoltHoleDiameter">
                                     <property name="text">
-                                        <string>0.3860</string>
+                                        <string>0.3750</string>
                                     </property>
                                     <property name="angle">
                                         <bool>false</bool>
@@ -415,7 +415,7 @@
                             <item row="20" column="1">
                                 <widget class="RMathLineEdit" name="BoltHoleDiameter2">
                                     <property name="text">
-                                        <string>0.3860</string>
+                                        <string>0.3750</string>
                                     </property>
                                     <property name="angle">
                                         <bool>false</bool>
