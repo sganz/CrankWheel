@@ -312,10 +312,13 @@ function simpleToothArea(innerRadius, outerRadius, sectorAngle) {
 // subtract the circle from the square and divide by 2 to get the area
 // of the base curves. This ONLY works because a Bulge of -1 is a semi-circle!
 function roundedRootToothArea(innerRadius, outerRadius, sectorAngle, rootRadius) {
-    const squareArea = rootRadius * rootRadius * 4; // area of a square
+    const squareArea = rootRadius * rootRadius * 4;
     const circleArea = Math.PI * rootRadius * rootRadius;
     const curveyRoots = (squareArea - circleArea) / 2; // area under both curvey parts
 
+    // now add the curvy part with the regular tooth part. Gets a close
+    // approximation, not exact but good enough. Draw the picture to see why
+    // and remember the tooth is an annular (arcs top and bottom)
     return simpleToothArea(innerRadius, outerRadius, sectorAngle) + curveyRoots;
 }
 
@@ -336,24 +339,6 @@ function balanceHoleAreaAtRadius(area, currentRadius, newRadius) {
 // angle in radians of course
 function chordLength(radius, angle) {
     return 2.0 * radius * Math.sin(angle / 2.0);
-}
-
-// Need function to calculate the distance from 2 polar points
-// This can be used for tooth width and calculating bulge radius
-// The distance is √r²₁1+r²₂−2r₁r₂cos(θ1−θ2)
-// sqrt((r1 * r1 + r2 * r2) - 2 * r1 * r2 * cos(θ1−θ2) )
-//
-// pt1, pt2 are the point arrays with [radius, angle_radians, bulge]
-// bulge is not used.
-//
-// This is the length (chord) not an arc length
-function polarDistance(pt1, pt2) {
-    const r1 = pt1[0]; // radius
-    const a1 = pt1[1]; // angle
-    const r2 = pt2[0]; // radius
-    const a2 = pt2[1]; // angle
-
-    return Math.sqrt((r1 * r1 + r2 * r2) - 2 * r1 * r2 * Math.cos(a1 - a2));
 }
 
 // Does all the drawing work. Remember most things here just add points (vertices)
