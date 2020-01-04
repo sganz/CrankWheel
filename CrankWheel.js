@@ -31,7 +31,9 @@
  *
  * Installation - Find your QCAD install directory, look for 'libraries/default' copy
  * the folder that is typically called 'CrankWheel' in the Github repository (can extract as a zip)
- * and restart QCAD it should now show up in your library browser.
+ * and restart QCAD it should now show up in your library browser. If on a Windows
+ * machine you may need to have admin rights. You can also install in a local directory
+ * and point QCAD's library path to include it as well.
  */
 
 function CrankWheel() {
@@ -295,7 +297,6 @@ function generateBoltPattern(boltCount, angleOffset, circleDiameter, boltDiamete
 // sectorAngle is the angle of the sector in DEGREES
 // A = ( R² - r² ) * π * angle / 360 Area of a sector Degs
 // A = ( R² - r² ) * π * angle / 2 * π Area of a sector Degs
-
 function simpleToothArea(innerRadius, outerRadius, sectorAngle) {
     return (outerRadius * outerRadius - innerRadius * innerRadius) * Math.PI * sectorAngle / (2 * Math.PI);
 }
@@ -389,7 +390,7 @@ CrankWheel.getOperation = function (di) {
     var td = [];    // tooth data user selected bulge
     var mtd = [];   // missing tooth data all nice lower arc
     var ltd = [];   // last tooth IF bulge root is selected needs to be different
-    var std = [];
+    var std = [];   // starting tooth (first)
 
     // This draws the top of the tooth's arch and the inner missing
     // arch which is later used IF missing teeth are specified
@@ -408,12 +409,12 @@ CrankWheel.getOperation = function (di) {
     //  td  - middle teeth
     //  ltd - last tooth
     //  mtd - outer missing tooth part
-
-    // the pitch circle - the (chord length / 2) is the radius of the bulge since
-    // the bulge is a semi-circle we can take advantage of this fact
+    // pitch circle - the (chord length / 2) is the radius of the bulge since
+    // the bulge is a semi-circle we can take advantage of this fact later on for tooth calculation
 
     CrankWheel.toothWidth = chordLength(wheelRadius, toothAngle);
     CrankWheel.toothGapWidth = chordLength(pitchCircleRadius, rootAngle);
+
     const curvePitchRadius = pitchCircleRadius - CrankWheel.toothGapWidth / 2.0;
     var curveOrFlatPitchRadius;
     var noMissingBulge;
@@ -462,7 +463,6 @@ CrankWheel.getOperation = function (di) {
     CrankWheel.centerAngle = RMath.rad2deg(Math.PI - (rootAngle + (rootAngle + toothAngle) * CrankWheel.missingTeeth) / 2);
 
     // need to pick based on tooth type and not do it if 0 missing teeth, need to calc a bit different
-
     if (CrankWheel.drawRoundedRoots) {
         // for rounded roots we need to know the radius of the root curve. We have that!
         CrankWheel.toothArea = roundedRootToothArea(pitchCircleRadius, wheelRadius, toothAngle, CrankWheel.toothGapWidth / 2.0);
@@ -621,9 +621,9 @@ CrankWheel.getOperation = function (di) {
         var wheelPitchData = new RCircleData(center, pitchCircleRadius);
         addOperation.addObject(new RCircleEntity(document, wheelPitchData));
 
-        // User defined circle for the counter weight
-        //var wheelPitchData = new RCircleData(center, pitchCircleRadius);
-        //addOperation.addObject(new RCircleEntity(document, wheelPitchData));
+        // User defined circle for the balance hole
+        var balanceHoleData = new RCircleData(center, CrankWheel.balanceHolePositionDiameter / 2.0);
+        addOperation.addObject(new RCircleEntity(document, balanceHoleData));
 
         // if we are drawing bolt holes draw that circle
         if (CrankWheel.boltHoleCount) {
