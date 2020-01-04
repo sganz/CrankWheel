@@ -61,7 +61,7 @@ All default measurements are in inches, and degrees. If you are running QCAD in 
 - Spoke Rotation - Rotates the spoke pattern some degrees, default is 0
 - Balance Hole Position Diameter - The position of the balance weight hole. This will be computed based on number of teeth. This will be positioned across from the center line of the missing teeth. Setting to 0 removes it. It is not drawn for wheels without missing teeth (Think about it). Moving this to a different position will make it useless (think about it too)
 - Show Legend - Shows a text legend on the drawing with all the parameters (can cause drawing to slow on some machines)
-- Debug - Draws any debug lines, typically circles to show layout
+- Debug - Draws any debug lines, typically circles to show layout can be useful to verify positions
 
 ## Todo
 - Add Round operation on spoke holes, easily done manually, but would be nice to do in the script
