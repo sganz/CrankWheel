@@ -72,6 +72,7 @@ CrankWheel.toothGapWidth = 0.0;
 CrankWheel.balanceHoleDiameter = 0.0;
 CrankWheel.balanceHolePositionDiameter = 0.0;
 CrankWheel.centerAngle = 180.0;
+CrankWheel.toothCurveRadius = 0;
 
 // CrankWheel Class
 CrankWheel.prototype.toString = function () {
@@ -109,6 +110,7 @@ CrankWheel.getLegendStr = function () {
     t += "Computed Tooth Width        : " + CrankWheel.toothWidth + "\n";
     t += "Computed Gap Width          : " + CrankWheel.toothGapWidth + "\n";
     t += "Center Angle                : " + CrankWheel.centerAngle + "\n";
+    t += "Tooth Rounding Radius       : " + CrankWheel.toothCurveRadius + "\n";
 
     return t;
 };
@@ -465,7 +467,8 @@ CrankWheel.getOperation = function (di) {
     // need to pick based on tooth type and not do it if 0 missing teeth, need to calc a bit different
     if (CrankWheel.drawRoundedRoots) {
         // for rounded roots we need to know the radius of the root curve. We have that!
-        CrankWheel.toothArea = roundedRootToothArea(pitchCircleRadius, wheelRadius, toothAngle, CrankWheel.toothGapWidth / 2.0);
+        CrankWheel.toothCurveRadius = CrankWheel.toothGapWidth / 2.0;
+        CrankWheel.toothArea = roundedRootToothArea(pitchCircleRadius, wheelRadius, toothAngle, CrankWheel.toothCurveRadius);
     }
     else {
         CrankWheel.toothArea = simpleToothArea(pitchCircleRadius, wheelRadius, toothAngle);
@@ -477,6 +480,8 @@ CrankWheel.getOperation = function (di) {
         CrankWheel.balanceHoleDiameter = circleAreaToRadius(leverArea) * 2.0;
 
         // draw the balance hole, use the pattern generator to rotate a single hole around
+        // this places the balance hole at the midpoint on the balance hole diameter.
+        // Not sure if this is technically correct because of the calculation but seems better.
         if (CrankWheel.balanceHoleDiameter > 0.0) {
             generateBoltPattern(
                 1,
