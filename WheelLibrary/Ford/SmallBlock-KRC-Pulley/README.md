@@ -1,5 +1,7 @@
 # Crank Wheel Definition
 
+![Image of 331-krc-crank-wheel-v3.dxf](https://raw.githubusercontent.com/sganz/CrankWheel/master/WheelLibrary/Ford/SmallBlock-KRC-Pulley/331-krc-crank-wheel-v3.png)
+
 ## File
 `331-krc-crank-wheel-v3.dxf`
 ## Engine
@@ -43,6 +45,9 @@ Center Angle                : 171.5
 Tooth Rounding Radius       : 0.17856697813945635
 
 ```
+## Versions
+Wheel Version : 3.0
+CrankWheel Generation Version 1.0.0
 ## Notes
 This DXF was generated for KRC Dry Dump Sump Mandrell to be fitted IN FRONT of the mandrell. The center hole should slip over the part and sit on TOP of one of the spacers. The mandrell has a radius at the bottom so if you do not want to use the spacer you should increase the center hole of the wheel to 2.5" or so. The initial fabrication for my application was made with .25" and will mount the wheel on top of one of the spacers to clear the radius as well as offset from the balancer. The Hall sensor is 12mm in diameter and will a nice fit so the wheel will not extend past the edge of the balancer.
 ## General Information
