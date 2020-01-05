@@ -32,6 +32,8 @@ If you enter invalid values you may get to see some odd drawings. Check your dat
 
 - If you like old school ROUND looking spokes. Set the spoke count to 0 and use the second set up bolts holes for that purpose.
 
+- If you like to have a more rounded looking slot for your spoke (not round) use QCAD's Round function (Keystrokes : RN). You can try different radius to suit your desired look. Typically the radius should be less then 1/4 of the width of the spoke. So if you have spoke holes at 4" inner and 5" outer, you would have a 1" width, try 0.25" or less for the rounding radius. See [Here](https://github.com/sganz/CrankWheel/issues/3) for an example.
+
 - You can't rotate the tooth pattern, but everything else can be. Make sure you can align your wheel based on the bolt hole locations. In many cases you can have multiple patterns at different angles or if you have a 3 bolt balancer you can set the hole count to 9 or 12 and have a lot of flexibility for positioning the wheel against your pickup.
 
 - The balancing hole will be generated automatically based on the diameter you set. It is not smart enough to know that it may overlap with a spoke hole. So you may have to play around a bit with spoke rotation, and thickness to get things just right.
@@ -39,6 +41,8 @@ If you enter invalid values you may get to see some odd drawings. Check your dat
 - Tooth width will depend on your sensor (Hall or VR) look at the data sheet for it and look for tooth specifications.
 
 - If you change some parameters to cause an error condition, generally the wheel will not be displayed as you drag the mouse into the drawing area. If you see this you may have an invalid setting.
+
+- Example how to properly round the missing tooth area is [Here](https://github.com/sganz/CrankWheel/issues/3)
 
 ## Wheel Parameters
 All default measurements are in inches, and degrees. If you are running QCAD in metric just change the values in the parameter dialog to be what you need. For bolt holes their are 2 sets, but are the same settings for either. Most all dimensions are in reference to a diameter. Generally parameters set to 0 will disable it's functionality.
