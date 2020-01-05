@@ -103,14 +103,13 @@ CrankWheel.getLegendStr = function () {
     t += "  Bolt Hole Circle Diameter : " + CrankWheel.boltHoleCircleDiameter2 + "\n";
     t += "  Bolt Hole Diameter        : " + CrankWheel.boltHoleDiameter2 + "\n";
     t += "  Bolt Pattern Rotate       : " + CrankWheel.boltPatternRotate2 + "\n";
-    t += "Tooth Area :                : " + CrankWheel.toothArea + "\n";
-
-    t += "Balance Hole Diameter       : " + CrankWheel.balanceHoleDiameter + "\n";
+    t += "Tooth Area :                : " + CrankWheel.toothArea.toFixed(5) + "\n";
+    t += "Balance Hole Diameter       : " + CrankWheel.balanceHoleDiameter.toFixed(5) + "\n";
     t += "Balance Position Diameter   : " + CrankWheel.balanceHolePositionDiameter + "\n";
-    t += "Computed Tooth Width        : " + CrankWheel.toothWidth + "\n";
-    t += "Computed Gap Width          : " + CrankWheel.toothGapWidth + "\n";
+    t += "Computed Tooth Width        : " + CrankWheel.toothWidth.toFixed(5) + "\n";
+    t += "Computed Gap Width          : " + CrankWheel.toothGapWidth.toFixed(5) + "\n";
     t += "Center Angle                : " + CrankWheel.centerAngle + "\n";
-    t += "Tooth Rounding Radius       : " + CrankWheel.toothCurveRadius + "\n";
+    t += "Tooth Rounding Radius       : " + CrankWheel.toothCurveRadius.toFixed(5) + "\n";
 
     return t;
 };
